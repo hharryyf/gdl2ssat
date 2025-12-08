@@ -16,11 +16,8 @@ import sys
 import os
 import re        
 
-def run():
-    if len(sys.argv) < 2:
-        print("Usage: python sqasp2ssat.py [a non-empty list of asp files that specifies the sasp]")
-        exit(1)
-    filelist = ' '.join(sys.argv[1:])
+def sasp2ssat(filelist):
+    filelist = ' '.join(filelist)
     cmd = f'clingo --output=smodels {filelist} | lp2normal2 | lp2lp2 | lp2acyc| lp2sat > temp.dimacs'
     os.system(f"bash -c '{cmd}'")
     
@@ -120,4 +117,9 @@ def run():
             print(line, end='')
     f.close()
 
-run()
+if __name__ == '__main__':
+    if len(sys.argv) < 2:
+        print("Usage: python sqasp2ssat.py [a non-empty list of asp files that specifies the sasp]")
+        exit(1)
+    
+    sasp2ssat(sys.argv[1:])
