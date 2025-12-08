@@ -16,7 +16,11 @@ import sys
 import os
 import re        
 
-def sasp2ssat(filelist):
+def sasp2ssat(filelist, outfile=''):
+    if outfile == '':
+        outfile = sys.stdout
+    else:
+        outfile = open(outfile, 'w')
     filelist = ' '.join(filelist)
     cmd = f'clingo --output=smodels {filelist} | lp2normal2 | lp2lp2 | lp2acyc| lp2sat > temp.dimacs'
     os.system(f"bash -c '{cmd}'")
@@ -91,35 +95,36 @@ def sasp2ssat(filelist):
         if i not in quantify:
             quant.append((mxlevel + 1, 'e', i))
 
-    print(f'p cnf {tol_var} {clause + tol_var - var}')
+    print(f'p cnf {tol_var} {clause + tol_var - var}', file=outfile)
 
     for i in range(len(quant)):
         quantype = quant[i][1]
         if quantype == 'e':
             if i == 0 or quant[i-1][1] != 'e':
-                print(f'e {quant[i][2]}', end='')
+                print(f'e {quant[i][2]}', end='', file=outfile)
             else:
-                print(f' {quant[i][2]}', end='')
+                print(f' {quant[i][2]}', end='', file=outfile)
             if i == len(quant) - 1:
-                print(' 0')
+                print(' 0', file=outfile)
         elif quantype == 'c':
             if i != 0 and quant[i-1][1] == 'e':
-                print(f' 0')
-            print(f'r {round(quant[i][3], 6)} {quant[i][2]} 0')
+                print(f' 0', file=outfile)
+            print(f'r {round(quant[i][3], 6)} {quant[i][2]} 0', file=outfile)
         
     for i in range(var + 1, 1 + tol_var):
-        print(-i, '0')
+        print(-i, '0', file=outfile)
     
     f = open('temp.dimacs', 'r')
     for line in f:
         li = line.strip().split()
         if len(li) != 0 and li[0] != 'p' and li[0] != 'c':
-            print(line, end='')
+            print(line, end='', file=outfile)
     f.close()
+    outfile.close()
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print("Usage: python sqasp2ssat.py [a non-empty list of asp files that specifies the sasp]")
+        print("Usage: python sqasp2ssat.py [a non-empty list of asp files that specifies the sasp]", file=sys.stderr)
         exit(1)
     
     sasp2ssat(sys.argv[1:])
