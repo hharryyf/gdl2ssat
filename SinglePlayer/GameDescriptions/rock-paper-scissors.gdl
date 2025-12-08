@@ -1,0 +1,57 @@
+(role xplayer)
+(role random)
+
+(base xrock)
+(base xpaper)
+(base xscissors)
+(base rrock)
+(base rpaper)
+(base rscissors)
+
+(base start)
+
+(<= (input ?p rock) (role ?p))
+(<= (input ?p scissors) (role ?p))
+(<= (input ?p paper) (role ?p))
+
+(init start)
+
+
+(legal xplayer rock)
+(legal xplayer paper)
+(legal xplayer scissors)
+
+(legal random rock)
+(legal random paper)
+(legal random scissors)
+
+(<= (next xpaper) (does xplayer paper))
+(<= (next xscissors) (does xplayer scissors))
+(<= (next xrock) (does xplayer rock))
+(<= (next rpaper) (does random paper))
+(<= (next rscissors) (does random scissors))
+(<= (next rrock) (does random rock))
+
+
+
+(<= terminal  (not (true start)))
+(<= (goal xplayer 100)  (true xpaper) (true rrock))
+(<= (goal random 0)  (true xpaper) (true rrock))
+(<= (goal xplayer 100)  (true xscissors) (true rpaper))
+(<= (goal random 0)  (true xscissors) (true rpaper))
+(<= (goal xplayer 100)  (true xrock) (true rscissors))
+(<= (goal random 0)  (true xrock) (true rscissors))
+
+(<= (goal random 100)  (true rpaper) (true xrock))
+(<= (goal xplayer 0)  (true rpaper) (true xrock))
+(<= (goal random 100)  (true rscissors) (true xpaper))
+(<= (goal xplayer 0)  (true rscissors) (true xpaper))
+(<= (goal random 100)  (true rrock) (true xscissors))
+(<= (goal xplayer 0)  (true rrock) (true xscissors))
+
+(<= (goal random 50)  (true rpaper) (true xpaper))
+(<= (goal random 50)  (true rscissors) (true xscissors))
+(<= (goal random 50)  (true rrock) (true xrock))
+(<= (goal xplayer 50)  (true rpaper) (true xpaper))
+(<= (goal xplayer 50)  (true rscissors) (true xscissors))
+(<= (goal xplayer 50)  (true rrock) (true xrock))
