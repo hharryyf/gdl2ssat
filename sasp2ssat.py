@@ -72,7 +72,7 @@ def sasp2ssat(filelist, outfile=''):
             if match.group(4) in names:
                 print(f'ERROR, {match.group(4)} quantified twice!')
                 exit(1)
-                names.add(match.group(4))
+            names.add(match.group(4))
             prob = (1.0 * int(match.group(2))) / (1.0 * int(match.group(3)))
             if match.group(4) in name2id:
                 quant.append((level, 'c', name2id[match.group(4)], prob))

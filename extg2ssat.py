@@ -3,6 +3,7 @@ import re
 import sys 
 import clingo
 from sasp2ssat import sasp2ssat
+import queue
 
 def get_random_action(name, path):
     moveL = set()
@@ -102,7 +103,115 @@ def model_random(name, randp, moveL):
     print(f'_exists(T * 2 - 1, does({name}, A, T)) :- mtdom(T), input({name}, A).', file=f)
 
     f.close()
+
+# TODO: quantifier shifting
+def quantifier_shifting(filelist):
+    cmd = f'clingo --output=smodels {' '.join(filelist)} > encoding_smodels.txt'
+    os.system(f"bash -c '{cmd}'")
+    f = open('encoding_smodels.txt', 'r')
+    outfile = open('quantification.lp', 'w')
+    # construct the dependency graph
+    edge = {}
+    id2name = {}
+    name2id = {}
+    state = 0
+    quantlevel = {}
+    visited = set()
+    quantified = set()
+    for line in f:
+        line = line.strip()
+        if line == '0':
+            state += 1
+            continue 
+        if state == 0:
+            line = list(map(int, line.split()))
+            # normal rule
+            # head number_of_lit number_of_neg_lit [negative lit] [positive lit]
+            if line[0] == 1:
+                head = line[1]
+                for i in range(4, len(line)):
+                    if line[i] not in edge:
+                        edge[line[i]] = set()
+                    edge[line[i]].add(head)
+            # head number_of_lit number_of_neg_lit bound [negative lit] [positive lit]
+            elif line[0] == 2:
+                head = line[1]
+                for i in range(5, len(line)):
+                    if line[i] not in edge:
+                        edge[line[i]] = set()
+                    edge[line[i]].add(head)
+            # number_of_head [head] number_of_lit number_of_neg_lit [negative lit] [positive lit]
+            elif line[0] == 3:
+                head_num = line[1]
+                head = []
+                for i in range(2, head_num + 2):
+                    head.append(line[i])
+                    # this part can be optimized
+                    for i in range(head_num + 4, len(line)):
+                        if line[i] not in edge:
+                            edge[line[i]] = set()
+                        for h in head:
+                            edge[line[i]].add(h)
+            else:
+                print('Cannot handle rule of type 4+ in Clingo!')
+                exit(1)
+        elif state == 1:
+            # here we process the atoms
+            # Aim: associate each atom with its id in the smodels, and
+            # 2) memorize the level order of the quantifiers
+            line = line.split()
+            id = int(line[0])
+            name = line[1]
+            id2name[id] = name 
+            name2id[name] = id 
+            if name[:8] == '_exists(':
+                match = re.match(r'_exists\((\d+),(.*)\)', name)  
+                lv = int(match.group(1))
+                quantified.add(match.group(2))
+                if lv not in quantlevel:
+                    quantlevel[lv] = set()
+                quantlevel[lv].add(('e', match.group(2)))         
+            elif name[:8] == '_chance(':
+                match = re.match(r'_chance\((\d+),(\d+),(\d+),(.*)\)', name)  
+                lv = int(match.group(1))
+                quantified.add(match.group(4))
+                if lv not in quantlevel:
+                    quantlevel[lv] = set()
+                quantlevel[lv].add(('c', match.group(4)))
+
+
+    def bfs(v, depth):
+        q = queue.Queue()
+        q.put(v)
+        while q.empty() == False:
+            curr = q.get()
+            if curr in visited:
+                continue
+            if curr in id2name:
+                atm = id2name[curr]
+                if atm not in quantified:
+                    print(f'_exists({depth},{atm}).', file=outfile)
+            visited.add(curr)
+
+            if curr in edge:
+                for nxt in edge[curr]:
+                    if nxt not in visited:
+                        q.put(nxt)
     
+    level_list = list(quantlevel)
+    level_list.sort(reverse=True)
+    for lv in level_list:
+        for tp, atom in quantlevel[lv]:
+            if atom in name2id and name2id[atom] not in visited:
+                if tp == 'e':
+                    bfs(name2id[atom], lv)
+                else:
+                    bfs(name2id[atom], lv + 1)
+    for id in id2name:
+        if id not in visited:
+            print(f'_exists(0, {id2name[id]}).', file=outfile)
+    outfile.close()
+    f.close()
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
@@ -115,5 +224,5 @@ if __name__ == '__main__':
 
     randp, moveL = base_encoding(name, path)
     model_random(name, randp, moveL)
-    # TODO: quantifier shifting
-    sasp2ssat(['base_encoding.lp', 'encoding_random.lp', path], outfile)
+    quantifier_shifting(['base_encoding.lp', 'encoding_random.lp', path])
+    sasp2ssat(['base_encoding.lp', 'encoding_random.lp', 'quantification.lp', path], outfile)

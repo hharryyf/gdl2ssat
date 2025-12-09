@@ -1,3 +1,6 @@
 *.dimacs
 try.lp
+quantification.lp
+encoding_smodels.txt
+
 
