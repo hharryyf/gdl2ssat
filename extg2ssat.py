@@ -77,8 +77,8 @@ def model_random(name, randp, moveL):
     print(f'ordom(1..{tol}).', file=f)
     print(f'legal_id(A, 0, T) :- front(A), not legal({randp}, A, T), mtdom(T).', file=f)
     print(f'legal_id(A, 1, T) :- front(A), legal({randp}, A, T), mtdom(T).', file=f)
-    print(f'legal_id(B, N, T) :- actord(A, B), legal(random, B, T), legal_id(A, N-1, T), ordom(N).', file=f)
-    print(f'legal_id(B, N, T) :- actord(A, B), not legal(random, B, T), legal_id(A, N, T), ordom(N).', file=f)
+    print(f'legal_id(B, N, T) :- actord(A, B), legal({randp}, B, T), legal_id(A, N-1, T), ordom(N).', file=f)
+    print(f'legal_id(B, N, T) :- actord(A, B), not legal({randp}, B, T), legal_id(A, N, T), ordom(N).', file=f)
     print(f'tol_act(N, T) :- legal_id(A, N, T), back(A).', file=f)
     print(file=f)
     # the probablistic variable (1/i,(i-1)/i)  for the random player
