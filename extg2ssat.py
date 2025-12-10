@@ -87,10 +87,10 @@ def model_random(name, randp, moveL):
     
     for i in range(1, tol + 1):
         if i == 1:
-            print(f'does({randp}, A, T) :- tol_act(1, T), not terminated(T), legal_id(A, 1, T).', file=f)
+            print(f'does({randp}, A, T) :- tol_act(1, T), not terminated(T), legal({randp}, A, T), legal_id(A, 1, T).', file=f)
         else:
             for j in range(i, 0, -1):
-                print(f'does({randp}, A, T) :- tol_act({i}, T), legal_id(A, {j}, T),  not terminated(T), mtdom(T)', end='', file=f)
+                print(f'does({randp}, A, T) :- tol_act({i}, T), legal({randp}, A, T), legal_id(A, {j}, T), not terminated(T), mtdom(T)', end='', file=f)
                 for k in range(i, j, -1):
                     print(f', not moveL({randp}, {k}, T)', file=f, end='')
                 if j != 1:

@@ -11,12 +11,12 @@ tol_act(N, T) :- legal_id(A, N, T), back(A).
 
 {moveL(random, 2, T)} :- mtdom(T).
 {moveL(random, 3, T)} :- mtdom(T).
-does(random, A, T) :- tol_act(1, T), not terminated(T), legal_id(A, 1, T).
-does(random, A, T) :- tol_act(2, T), legal_id(A, 2, T),  not terminated(T), mtdom(T), moveL(random, 2, T).
-does(random, A, T) :- tol_act(2, T), legal_id(A, 1, T),  not terminated(T), mtdom(T), not moveL(random, 2, T).
-does(random, A, T) :- tol_act(3, T), legal_id(A, 3, T),  not terminated(T), mtdom(T), moveL(random, 3, T).
-does(random, A, T) :- tol_act(3, T), legal_id(A, 2, T),  not terminated(T), mtdom(T), not moveL(random, 3, T), moveL(random, 2, T).
-does(random, A, T) :- tol_act(3, T), legal_id(A, 1, T),  not terminated(T), mtdom(T), not moveL(random, 3, T), not moveL(random, 2, T).
+does(random, A, T) :- tol_act(1, T), not terminated(T), legal(random, A, T), legal_id(A, 1, T).
+does(random, A, T) :- tol_act(2, T), legal(random, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), moveL(random, 2, T).
+does(random, A, T) :- tol_act(2, T), legal(random, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(random, 2, T).
+does(random, A, T) :- tol_act(3, T), legal(random, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), moveL(random, 3, T).
+does(random, A, T) :- tol_act(3, T), legal(random, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(random, 3, T), moveL(random, 2, T).
+does(random, A, T) :- tol_act(3, T), legal(random, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(random, 3, T), not moveL(random, 2, T).
 
 % Basic quantifiers
 _chance(T * 2, 1, I, moveL(random, I, T)) :- mtdom(T), ordom(I), I > 1.

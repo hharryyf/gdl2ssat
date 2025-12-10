@@ -58,19 +58,34 @@ def sasp2ssat(filelist, outfile=''):
                 quant.append((level, 'e', name2id[match.group(2)]))
                 quantify.add(name2id[match.group(2)])
                 if match.group(2) in names:
-                    print(f'ERROR, {match.group(2)} quantified twice!')
+                    print(f'ERROR, {match.group(2)} quantified twice!', file=sys.stderr)
                     exit(1)
                 names.add(match.group(2))
+        elif item[0][:8] == '_forall(':
+            match = re.match(r'_forall\((\d+),(.*)\)', item[0])  
+            level = int(match.group(1))
+            quant.append((-1, 'a', item[1]))
+            quantify.add(item[1])
+            if match.group(2) in name2id:
+                quant.append((level, 'a', name2id[match.group(2)]))
+                quantify.add(name2id[match.group(2)])
+                if match.group(2) in names:
+                    print(f'ERROR, {match.group(2)} quantified twice!', file=sys.stderr)
+                    exit(1)
+                names.add(match.group(2))
+            else:
+                print(f'Universal Unit Literal! Automatically UNSAT', file=sys.stderr)
+                exit(0)
         elif item[0][:8] == '_chance(':
             match = re.match(r'_chance\((\d+),(\d+),(\d+),(.*)\)', item[0])  
             level = int(match.group(1))
             quant.append((-1, 'e', item[1]))
             quantify.add(item[1])
             if int(match.group(2)) > int(match.group(3)) or int(match.group(2)) < 0 or int(match.group(3)) <= 0:
-                print('ERROR: Invalid probability, must be of the form p/q and p >= 0 && q > 0')
+                print('ERROR: Invalid probability, must be of the form p/q and p >= 0 && q > 0', file=sys.stderr)
                 exit(1)
             if match.group(4) in names:
-                print(f'ERROR, {match.group(4)} quantified twice!')
+                print(f'ERROR, {match.group(4)} quantified twice!', file=sys.stderr)
                 exit(1)
             names.add(match.group(4))
             prob = (1.0 * int(match.group(2))) / (1.0 * int(match.group(3)))
@@ -82,7 +97,7 @@ def sasp2ssat(filelist, outfile=''):
                 tol_var += 1
     
     for name in name2id:
-        if name not in names and name[:8] != '_exists(' and name[:8] != '_chance(':
+        if name not in names and name[:8] != '_exists(' and name[:8] != '_chance(' and name[:8] != '_forall(':
             print(f'Warning: atom {name} not quantified', file=sys.stderr)
 
     quant.sort()
@@ -99,17 +114,17 @@ def sasp2ssat(filelist, outfile=''):
 
     for i in range(len(quant)):
         quantype = quant[i][1]
-        if quantype == 'e':
-            if i == 0 or quant[i-1][1] != 'e':
-                print(f'e {quant[i][2]}', end='', file=outfile)
+        if quantype == 'e' or quantype == 'a':
+            if i == 0 or quant[i-1][1] != quant[i][1]:
+                print(f'{quantype} {quant[i][2]}', end='', file=outfile)
             else:
                 print(f' {quant[i][2]}', end='', file=outfile)
             if i == len(quant) - 1:
                 print(' 0', file=outfile)
         elif quantype == 'c':
-            if i != 0 and quant[i-1][1] == 'e':
+            if i != 0 and quant[i-1][1] != 'c':
                 print(f' 0', file=outfile)
-            print(f'r {round(quant[i][3], 6)} {quant[i][2]} 0', file=outfile)
+            print(f'r {round(quant[i][3], 9)} {quant[i][2]} 0', file=outfile)
         
     for i in range(var + 1, 1 + tol_var):
         print(-i, '0', file=outfile)
