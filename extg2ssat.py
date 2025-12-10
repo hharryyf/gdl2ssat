@@ -170,7 +170,14 @@ def quantifier_shifting(filelist):
                 quantified.add(match.group(2))
                 if lv not in quantlevel:
                     quantlevel[lv] = set()
-                quantlevel[lv].add(('e', match.group(2)))         
+                quantlevel[lv].add(('e', match.group(2)))  
+            elif name[:8] == '_forall(':
+                match = re.match(r'_forall\((\d+),(.*)\)', name)  
+                lv = int(match.group(1))
+                quantified.add(match.group(2))
+                if lv not in quantlevel:
+                    quantlevel[lv] = set()
+                quantlevel[lv].add(('a', match.group(2)))         
             elif name[:8] == '_chance(':
                 match = re.match(r'_chance\((\d+),(\d+),(\d+),(.*)\)', name)  
                 lv = int(match.group(1))

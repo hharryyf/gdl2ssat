@@ -1,16 +1,19 @@
 # a converter from sasp to ssat
 # Usage: python sqasp2ssat.py [list of clingo files that specifies the sasp]
 # sasp extends normal logic ASP with existential and change quantifiers
-# _exists and _chance are two preserved keywords
-# _exists(i, at) means atom at is quantified at level i
-# _chance(i, p, q, at) means atom at is quantified at level i and
+# _exists, _chance, and _forall are three preserved keywords
+# _exists(i, at) means atom at is quantified existentially at level i (i > 0)
+# _forall(i, at) means atom at is quantified universally at level i (i > 0)
+# _chance(i, p, q, at) means atom at is quantified at level i (i > 0) and
 # has a probablisty of p/q of being true
 
 # The translation first converts the ASP to ground program of smodels representation
 # Then, it converts the smodels program to SAT using the toolchain ASP -> lp2normal2 -> lp2acyc -> lp2sat
 # Finally, it adds back the quantifiers that appears in the ASP ground program
-# Edge case: If a chance atom at does not appear in the ground atoms
+# Edge cases: 1) If a chance atom at does not appear in the ground atoms
 # A unit clause -at must must be added to the matrix of the SSAT
+#             2) If a universal atom at does not appear in the ground atoms
+# The formula is directly UNSAT 
 
 import sys 
 import os
@@ -64,7 +67,7 @@ def sasp2ssat(filelist, outfile=''):
         elif item[0][:8] == '_forall(':
             match = re.match(r'_forall\((\d+),(.*)\)', item[0])  
             level = int(match.group(1))
-            quant.append((-1, 'a', item[1]))
+            quant.append((-1, 'e', item[1]))
             quantify.add(item[1])
             if match.group(2) in name2id:
                 quant.append((level, 'a', name2id[match.group(2)]))
@@ -115,6 +118,8 @@ def sasp2ssat(filelist, outfile=''):
     for i in range(len(quant)):
         quantype = quant[i][1]
         if quantype == 'e' or quantype == 'a':
+            if i != 0 and quant[i-1][1] != 'c' and quant[i-1][1] != quant[i][1]:
+                print(f' 0', file=outfile)
             if i == 0 or quant[i-1][1] != quant[i][1]:
                 print(f'{quantype} {quant[i][2]}', end='', file=outfile)
             else:
