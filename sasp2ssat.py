@@ -129,7 +129,7 @@ def sasp2ssat(filelist, outfile=''):
         elif quantype == 'c':
             if i != 0 and quant[i-1][1] != 'c':
                 print(f' 0', file=outfile)
-            print(f'r {round(quant[i][3], 9)} {quant[i][2]} 0', file=outfile)
+            print(f'r {round(quant[i][3], 15)} {quant[i][2]} 0', file=outfile)
         
     for i in range(var + 1, 1 + tol_var):
         print(-i, '0', file=outfile)

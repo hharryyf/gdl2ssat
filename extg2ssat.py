@@ -49,7 +49,7 @@ def get_random_action(name, path):
 def base_encoding(name, path):
     f = open('base_encoding.lp', 'w')
     print('tdom(T+1) :- mtdom(T). tdom(1).', file=f)
-    print('1 {' + f'does({name}, A, T) : input(xplayer, A)' + '} 1 :- mtdom(T), not terminated(T).', file=f)
+    print('1 {' + f'does({name}, A, T) : input({name}, A)' + '} 1 :- mtdom(T), not terminated(T).', file=f)
     print('terminated(T) :- terminal(T).', file=f)
     print('terminated(T+1) :- terminated(T), mtdom(T).', file=f)
     print(':- does(R, A, T), not legal(R, A, T).', file=f)
@@ -78,7 +78,7 @@ def model_random(name, randp, moveL):
     print(f'legal_id(A, 0, T) :- front(A), not legal({randp}, A, T), mtdom(T).', file=f)
     print(f'legal_id(A, 1, T) :- front(A), legal({randp}, A, T), mtdom(T).', file=f)
     print(f'legal_id(B, N, T) :- actord(A, B), legal({randp}, B, T), legal_id(A, N-1, T), ordom(N).', file=f)
-    print(f'legal_id(B, N, T) :- actord(A, B), not legal({randp}, B, T), legal_id(A, N, T), ordom(N).', file=f)
+    print(f'legal_id(B, N, T) :- actord(A, B), not legal({randp}, B, T), legal_id(A, N, T).', file=f)
     print(f'tol_act(N, T) :- legal_id(A, N, T), back(A).', file=f)
     print(file=f)
     # the probablistic variable (1/i,(i-1)/i)  for the random player

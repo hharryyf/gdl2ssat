@@ -1,86 +1,198 @@
-front(mark(1,1)). back(noop).
-actord(mark(1,1), mark(1,2)).
-actord(mark(1,2), mark(1,3)).
-actord(mark(1,3), mark(2,1)).
-actord(mark(2,1), mark(2,2)).
-actord(mark(2,2), mark(2,3)).
-actord(mark(2,3), mark(3,1)).
-actord(mark(3,1), mark(3,2)).
-actord(mark(3,2), mark(3,3)).
-actord(mark(3,3), noop).
+front(move(1,1,1,2)). back(noop).
+actord(move(1,1,1,2), move(1,1,2,2)).
+actord(move(1,1,2,2), move(1,2,1,3)).
+actord(move(1,2,1,3), move(1,2,2,3)).
+actord(move(1,2,2,3), move(1,3,1,4)).
+actord(move(1,3,1,4), move(1,3,2,4)).
+actord(move(1,3,2,4), move(1,4,1,5)).
+actord(move(1,4,1,5), move(1,4,2,5)).
+actord(move(1,4,2,5), move(2,1,1,2)).
+actord(move(2,1,1,2), move(2,1,2,2)).
+actord(move(2,1,2,2), move(2,2,1,3)).
+actord(move(2,2,1,3), move(2,2,2,3)).
+actord(move(2,2,2,3), move(2,3,1,4)).
+actord(move(2,3,1,4), move(2,3,2,4)).
+actord(move(2,3,2,4), move(2,4,1,5)).
+actord(move(2,4,1,5), move(2,4,2,5)).
+actord(move(2,4,2,5), noop).
 
-ordom(1..10).
-legal_id(A, 0, T) :- front(A), not legal(oplayer, A, T), mtdom(T).
-legal_id(A, 1, T) :- front(A), legal(oplayer, A, T), mtdom(T).
-legal_id(B, N, T) :- actord(A, B), legal(oplayer, B, T), legal_id(A, N-1, T), ordom(N).
-legal_id(B, N, T) :- actord(A, B), not legal(oplayer, B, T), legal_id(A, N, T), ordom(N).
+ordom(1..17).
+legal_id(A, 0, T) :- front(A), not legal(xplayer, A, T), mtdom(T).
+legal_id(A, 1, T) :- front(A), legal(xplayer, A, T), mtdom(T).
+legal_id(B, N, T) :- actord(A, B), legal(xplayer, B, T), legal_id(A, N-1, T), ordom(N).
+legal_id(B, N, T) :- actord(A, B), not legal(xplayer, B, T), legal_id(A, N, T).
 tol_act(N, T) :- legal_id(A, N, T), back(A).
 
-{moveL(oplayer, 2, T)} :- mtdom(T).
-{moveL(oplayer, 3, T)} :- mtdom(T).
-{moveL(oplayer, 4, T)} :- mtdom(T).
-{moveL(oplayer, 5, T)} :- mtdom(T).
-{moveL(oplayer, 6, T)} :- mtdom(T).
-{moveL(oplayer, 7, T)} :- mtdom(T).
-{moveL(oplayer, 8, T)} :- mtdom(T).
-{moveL(oplayer, 9, T)} :- mtdom(T).
-{moveL(oplayer, 10, T)} :- mtdom(T).
-does(oplayer, A, T) :- tol_act(1, T), not terminated(T), legal(oplayer, A, T), legal_id(A, 1, T).
-does(oplayer, A, T) :- tol_act(2, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(2, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(3, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(3, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(3, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(4, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(4, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(4, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(4, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(5, T), legal(oplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), moveL(oplayer, 5, T).
-does(oplayer, A, T) :- tol_act(5, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(oplayer, 5, T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(5, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(5, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(5, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(6, T), legal(oplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), moveL(oplayer, 6, T).
-does(oplayer, A, T) :- tol_act(6, T), legal(oplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(oplayer, 6, T), moveL(oplayer, 5, T).
-does(oplayer, A, T) :- tol_act(6, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(6, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(6, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(6, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), moveL(oplayer, 7, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(oplayer, 7, T), moveL(oplayer, 6, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), moveL(oplayer, 5, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(7, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), moveL(oplayer, 8, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), moveL(oplayer, 7, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), moveL(oplayer, 6, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), moveL(oplayer, 5, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(8, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), moveL(oplayer, 9, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), moveL(oplayer, 8, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), moveL(oplayer, 7, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), moveL(oplayer, 6, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), moveL(oplayer, 5, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(9, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), moveL(oplayer, 10, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), moveL(oplayer, 9, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), moveL(oplayer, 8, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), moveL(oplayer, 7, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), moveL(oplayer, 6, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), moveL(oplayer, 5, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), moveL(oplayer, 4, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), moveL(oplayer, 3, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), moveL(oplayer, 2, T).
-does(oplayer, A, T) :- tol_act(10, T), legal(oplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(oplayer, 10, T), not moveL(oplayer, 9, T), not moveL(oplayer, 8, T), not moveL(oplayer, 7, T), not moveL(oplayer, 6, T), not moveL(oplayer, 5, T), not moveL(oplayer, 4, T), not moveL(oplayer, 3, T), not moveL(oplayer, 2, T).
+{moveL(xplayer, 2, T)} :- mtdom(T).
+{moveL(xplayer, 3, T)} :- mtdom(T).
+{moveL(xplayer, 4, T)} :- mtdom(T).
+{moveL(xplayer, 5, T)} :- mtdom(T).
+{moveL(xplayer, 6, T)} :- mtdom(T).
+{moveL(xplayer, 7, T)} :- mtdom(T).
+{moveL(xplayer, 8, T)} :- mtdom(T).
+{moveL(xplayer, 9, T)} :- mtdom(T).
+{moveL(xplayer, 10, T)} :- mtdom(T).
+{moveL(xplayer, 11, T)} :- mtdom(T).
+{moveL(xplayer, 12, T)} :- mtdom(T).
+{moveL(xplayer, 13, T)} :- mtdom(T).
+{moveL(xplayer, 14, T)} :- mtdom(T).
+{moveL(xplayer, 15, T)} :- mtdom(T).
+{moveL(xplayer, 16, T)} :- mtdom(T).
+{moveL(xplayer, 17, T)} :- mtdom(T).
+does(xplayer, A, T) :- tol_act(1, T), not terminated(T), legal(xplayer, A, T), legal_id(A, 1, T).
+does(xplayer, A, T) :- tol_act(2, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(2, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(3, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(3, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(3, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(4, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(4, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(4, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(4, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(5, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(5, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(5, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(5, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(5, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(6, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(6, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(6, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(6, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(6, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(6, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(7, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(8, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(9, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(10, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(11, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 12, T), not terminated(T), mtdom(T), moveL(xplayer, 12, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(12, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 13, T), not terminated(T), mtdom(T), moveL(xplayer, 13, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 12, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), moveL(xplayer, 12, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(13, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 14, T), not terminated(T), mtdom(T), moveL(xplayer, 14, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 13, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), moveL(xplayer, 13, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 12, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), moveL(xplayer, 12, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(14, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 15, T), not terminated(T), mtdom(T), moveL(xplayer, 15, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 14, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), moveL(xplayer, 14, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 13, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), moveL(xplayer, 13, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 12, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), moveL(xplayer, 12, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(15, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 16, T), not terminated(T), mtdom(T), moveL(xplayer, 16, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 15, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), moveL(xplayer, 15, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 14, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), moveL(xplayer, 14, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 13, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), moveL(xplayer, 13, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 12, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), moveL(xplayer, 12, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(16, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 17, T), not terminated(T), mtdom(T), moveL(xplayer, 17, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 16, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), moveL(xplayer, 16, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 15, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), moveL(xplayer, 15, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 14, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), moveL(xplayer, 14, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 13, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), moveL(xplayer, 13, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 12, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), moveL(xplayer, 12, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 11, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), moveL(xplayer, 11, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 10, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), moveL(xplayer, 10, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 9, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), moveL(xplayer, 9, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 8, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), moveL(xplayer, 8, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 7, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), moveL(xplayer, 7, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 6, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), moveL(xplayer, 6, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 5, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), moveL(xplayer, 5, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 4, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), moveL(xplayer, 4, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 3, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), moveL(xplayer, 3, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 2, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), moveL(xplayer, 2, T).
+does(xplayer, A, T) :- tol_act(17, T), legal(xplayer, A, T), legal_id(A, 1, T), not terminated(T), mtdom(T), not moveL(xplayer, 17, T), not moveL(xplayer, 16, T), not moveL(xplayer, 15, T), not moveL(xplayer, 14, T), not moveL(xplayer, 13, T), not moveL(xplayer, 12, T), not moveL(xplayer, 11, T), not moveL(xplayer, 10, T), not moveL(xplayer, 9, T), not moveL(xplayer, 8, T), not moveL(xplayer, 7, T), not moveL(xplayer, 6, T), not moveL(xplayer, 5, T), not moveL(xplayer, 4, T), not moveL(xplayer, 3, T), not moveL(xplayer, 2, T).
 
 % Basic quantifiers
-_chance(T * 2, 1, I, moveL(oplayer, I, T)) :- mtdom(T), ordom(I), I > 1.
-_exists(T * 2 - 1, does(xplayer, A, T)) :- mtdom(T), input(xplayer, A).
+_chance(T * 2, 1, I, moveL(xplayer, I, T)) :- mtdom(T), ordom(I), I > 1.
+_exists(T * 2 - 1, does(oplayer, A, T)) :- mtdom(T), input(oplayer, A).
