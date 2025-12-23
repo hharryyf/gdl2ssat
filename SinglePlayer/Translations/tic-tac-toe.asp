@@ -10,11 +10,11 @@ base(cell(X35236, X35237, o)) :- index(X35236), index(X35237), domdomain(2, X352
 base(control(X35236)) :- role(X35236), domdomain(4, X35236).
 input(X35234, mark(X35237, X35238)) :- index(X35237), index(X35238), role(X35234), domdomain(4, X35234), domdomain(2, X35237), domdomain(2, X35238).
 input(X35234, noop) :- role(X35234), domdomain(4, X35234).
-true(cell(1, 1, x), 1).
-true(cell(1, 2, x), 1).
-true(cell(1, 3, o), 1).
+true(cell(1, 1, b), 1).
+true(cell(1, 2, b), 1).
+true(cell(1, 3, b), 1).
 true(cell(2, 1, b), 1).
-true(cell(2, 2, o), 1).
+true(cell(2, 2, b), 1).
 true(cell(2, 3, b), 1).
 true(cell(3, 1, b), 1).
 true(cell(3, 2, b), 1).

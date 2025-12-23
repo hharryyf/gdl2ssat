@@ -117,6 +117,8 @@ def sasp2ssat(filelist, outfile=''):
 
     for i in range(len(quant)):
         quantype = quant[i][1]
+        #if quant[i][2] == 7405:
+        #    print(quant[i], file=sys.stderr)
         if quantype == 'e' or quantype == 'a':
             if i != 0 and quant[i-1][1] != 'c' and quant[i-1][1] != quant[i][1]:
                 print(f' 0', file=outfile)
@@ -141,10 +143,26 @@ def sasp2ssat(filelist, outfile=''):
             print(line, end='', file=outfile)
     f.close()
     outfile.close()
+    # if outfile != '':
+    #     f = open('out.sdimacs', 'r')
+    #     exists = set()
+    #     all = set()
+    #     for line in f:
+    #         li = line.strip().split()
+    #         if li[0] == 'e':
+    #             for i in range(1, len(li) - 1):
+    #                 if int(li[i]) in exists or int(li[i]) in all:
+    #                     print('ERROR ! ', li[i], 'Quantified Twice!', file=sys.stderr)
+    #                 exists.add(int(li[i]))
+    #         elif li[0] == 'a':
+    #             for i in range(1, len(li) - 1):
+    #                 if int(li[i]) in exists or int(li[i]) in all:
+    #                     print('ERROR ! ', li[i], 'Quantified Twice!', file=sys.stderr)
+    #                 all.add(int(li[i]))
+    #     f.close()
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python sqasp2ssat.py [a non-empty list of asp files that specifies the sasp]", file=sys.stderr)
         exit(1)
-    
-    sasp2ssat(sys.argv[1:])
+    sasp2ssat(sys.argv[1:], 'out.sdimacs')

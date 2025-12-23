@@ -3,6 +3,7 @@ import re
 import sys 
 import clingo
 from sasp2ssat import sasp2ssat
+from turn import get_o_noop
 import queue
 
 def get_player_action(player, path):
@@ -47,43 +48,50 @@ def base_encoding(name):
     print(file=f)
     f.close()
     
-def model_random(randp, moveR):
+def model_random(randp, moveR, turns, horizon):
     tol = len(moveR)
     f = open('encoding_random.lp', 'w')
     print(f'front({moveR[0]}). back({moveR[-1]}).', file=f)
     for i in range(1, len(moveR)):
         print(f'actord({moveR[i-1]}, {moveR[i]}).', file=f)
     print(file=f)
-    print(f'ordom(1..{tol}).', file=f)
+    for i in range(1, horizon + 1):
+        if i in turns:
+            print(f'ordom(1..{turns[i][1]},{i}).', file=f)
+        else:
+            print(f'ordom(1..{tol},{i}).', file=f)
+    #print(f'ordom(1..{tol}, T) :- mtdom(T).', file=f)
     print(f'legal_id(A, 0, T) :- front(A), not legal({randp}, A, T), mtdom(T).', file=f)
     print(f'legal_id(A, 1, T) :- front(A), legal({randp}, A, T), mtdom(T).', file=f)
-    print(f'legal_id(B, N, T) :- actord(A, B), legal({randp}, B, T), legal_id(A, N-1, T), ordom(N).', file=f)
+    print(f'legal_id(B, N, T) :- actord(A, B), legal({randp}, B, T), legal_id(A, N-1, T), ordom(N, T).', file=f)
     print(f'legal_id(B, N, T) :- actord(A, B), not legal({randp}, B, T), legal_id(A, N, T).', file=f)
     print(f'tol_act(N, T) :- legal_id(A, N, T), back(A).', file=f)
     print(file=f)
     # the probablistic variable (1/i,(i-1)/i)  for the random player
-    for i in range(2, tol + 1):
-        print('{moveR(' + f'{randp}, {i}, T)' +'} :- mtdom(T).', file=f)
+    print('{moveR(' + f'{randp}, I, T)' +'} :- ordom(I, T), I > 1.', file=f)
     
-    for i in range(2, tol + 1):
-        if i == 1:
-            print(f'does({randp}, A, T) :- tol_act(1, T), not terminated(T), legal({randp}, A, T), legal_id(A, 1, T).', file=f)
-        else:
+    for time in range(1, horizon + 1):
+        low = 2
+        high = tol 
+        if time in turns:
+            low = max(turns[time][0], 2)
+            high = turns[time][1]
+        for i in range(low, high + 1):
             for j in range(i, 0, -1):
-                print(f'does({randp}, A, T) :- tol_act({i}, T), legal({randp}, A, T), legal_id(A, {j}, T), not terminated(T), mtdom(T)', end='', file=f)
+                print(f'does({randp}, A, {time}) :- tol_act({i}, {time}), legal({randp}, A, {time}), legal_id(A, {j}, {time}), not terminated({time})', end='', file=f)
                 for k in range(i, j, -1):
-                    print(f', not moveR({randp}, {k}, T)', file=f, end='')
+                    print(f', not moveR({randp}, {k}, {time})', file=f, end='')
                 if j != 1:
-                    print(f', moveR({randp}, {j}, T).', file=f)
+                    print(f', moveR({randp}, {j}, {time}).', file=f)
                 else:
                     print('.', file=f)
     print(file=f)
     print('% Basic quantifiers', file=f)
-    print(f'_chance(T * 5 - 1, 1, I, moveR({randp}, I, T)) :- mtdom(T), ordom(I), I > 1.', file=f)
+    print(f'_chance(T * 5 - 1, 1, I, moveR({randp}, I, T)) :- mtdom(T), ordom(I, T), I > 1.', file=f)
     print(f'_exists(T * 5, does({randp}, A, T)) :- mtdom(T), input({randp}, A).', file=f)
     f.close()
 
-def model_adverse(adv, moveL):
+def model_adverse(adv, moveL, turns, horizon):
     f = open('encoding_adverse.lp', 'w')
     tol, lenl = 0, len(moveL)
     while (1 << tol) < lenl:
@@ -92,27 +100,35 @@ def model_adverse(adv, moveL):
     print(f'ldom({adv}, 1..{tol}).', file=f)
     print('% log-encoding', file=f)
 
-    print(f"{{moveL({adv}, M, T) : ldom({adv}, M)}} :- mtdom(T).",file=f)
+
+    for i in range(1, horizon + 1):
+        if i not in turns:
+            print(f"{{moveL({adv}, M, {i})}} :-  ldom({adv}, M).",file=f)
     
-    j = 0
-    for i in range(0, 1 << tol):
-        if j < len(moveL):
-            print(f'does({adv}, {moveL[j]}, T) :- ', end='', file=f)
-            for k in range(0, tol):
-                if ((i >> k) & 1) == 0:
-                    print('not ', end='', file=f)
-                if k == tol - 1:
-                    if i == 0:
-                        print(f'moveL({adv}, {k+1}' + f', T), ' + f'legal({adv}, {moveL[j]}, T), not terminated(T).', file=f)
-                    else:
-                        print(f'moveL({adv}, {k+1}' + f', T), ' + f'legal({adv}, {moveL[j]}, T), not terminated(T).', file=f)
-                else:
-                    print(f'moveL({adv}, {k+1}' + f', T), ', end='', file=f)
-        
-        j += 1
-    
+    for time in range(1, horizon + 1):
+        if time not in turns:
+            j = 0
+            for i in range(0, 1 << tol):
+                if j < len(moveL):
+                    print(f'does({adv}, {moveL[j]}, {time}) :- ', end='', file=f)
+                    for k in range(0, tol):
+                        if ((i >> k) & 1) == 0:
+                            print('not ', end='', file=f)
+                        if k == tol - 1:
+                            if i == 0:
+                                print(f'moveL({adv}, {k+1}' + f', {time}), ' + f'legal({adv}, {moveL[j]}, {time}), not terminated({time}).', file=f)
+                            else:
+                                print(f'moveL({adv}, {k+1}' + f', {time}), ' + f'legal({adv}, {moveL[j]}, {time}), not terminated({time}).', file=f)
+                        else:
+                            print(f'moveL({adv}, {k+1}' + f', {time}), ', end='', file=f)
+                
+                j += 1
+            
     print(file=f)
-    print(f'_forall(T * 5 - 3, moveL({adv}, I, T)) :- mtdom(T), ldom({adv}, I).', file=f)
+    for i in range(1, horizon + 1):
+        if i not in turns:
+            print(f'_forall({i} * 5 - 3, moveL({adv}, I, {i})) :- ldom({adv}, I).', file=f)
+    
     print(f'_exists(T * 5 - 2, does({adv}, A, T)) :- mtdom(T), input({adv}, A).', file=f)
     
     f.close()
@@ -233,6 +249,83 @@ def quantifier_shifting(filelist):
     outfile.close()
     f.close()
 
+
+def get_horizon(file):
+    with open(file, "r") as g:
+        ASP_program = g.read()
+    ASP_program += f'#show.'
+    ASP_program += f'#show mtdom/1.'
+    # Control object is a low-level interface for controlling the grounding/solving process.
+    ctl = clingo.Control(arguments=['-W', 'none'])  # Here you can write the arguments you would pass to clingo by command line.
+    ctl.add("base", [], ASP_program)  # Adds the program to the control object.
+    ctl.ground([("base", [])])  # Grounding...
+
+    # Solving...
+    horizon = 0
+    with ctl.solve(yield_=True) as solution_iterator:
+        for model in solution_iterator:
+            # Model is an instance of clingo.solving.Model class 
+            # Reference: https://potassco.org/clingo/python-api/current/clingo/solving.html#clingo.solving.Model
+            for s in str(model).split():
+                s = re.match(r'mtdom\((\d+)\)', s).group(1)
+                horizon = max(horizon, int(s))
+    
+    return horizon
+
+def get_randturn(turnfile, horizon):
+    #print(turnfile, horizon)
+    with open(turnfile, "r") as g:
+        ASP_program = g.read()
+    ASP_program += f'mtdom(1..{horizon}).'
+    ASP_program += f'#show.'
+    ASP_program += f'#show _randturn/3.'
+    # Control object is a low-level interface for controlling the grounding/solving process.
+    ctl = clingo.Control(arguments=['-W', 'none'])  # Here you can write the arguments you would pass to clingo by command line.
+    ctl.add("base", [], ASP_program)  # Adds the program to the control object.
+    ctl.ground([("base", [])])  # Grounding...
+
+    # Solving...
+    turns = {}
+    with ctl.solve(yield_=True) as solution_iterator:
+        for model in solution_iterator:
+            # Model is an instance of clingo.solving.Model class 
+            # Reference: https://potassco.org/clingo/python-api/current/clingo/solving.html#clingo.solving.Model
+            for s in str(model).split():
+                s = re.match(r'_randturn\((\d+),(\d+),(\d+)\)', s)
+                low = int(s.group(1))
+                high = int(s.group(2))
+                time = int(s.group(3))
+                turns[time] = (low,high)
+    return turns
+
+
+def get_advturn(turnfile, horizon):
+    #print(turnfile, horizon)
+    with open(turnfile, "r") as g:
+        ASP_program = g.read()
+    ASP_program += f'mtdom(1..{horizon}).'
+    ASP_program += f'#show.'
+    ASP_program += f'#show _advnoop/1.'
+    # Control object is a low-level interface for controlling the grounding/solving process.
+    ctl = clingo.Control(arguments=['-W', 'none'])  # Here you can write the arguments you would pass to clingo by command line.
+    ctl.add("base", [], ASP_program)  # Adds the program to the control object.
+    ctl.ground([("base", [])])  # Grounding...
+
+    # Solving...
+    turns = set()
+    with ctl.solve(yield_=True) as solution_iterator:
+        for model in solution_iterator:
+            # Model is an instance of clingo.solving.Model class 
+            # Reference: https://potassco.org/clingo/python-api/current/clingo/solving.html#clingo.solving.Model
+            for s in str(model).split():
+                s = re.match(r'_advnoop\((\d+)\)', s)
+                low = int(s.group(1))
+                turns.add(low)
+    return turns
+
+
+
+
 if __name__ == '__main__':
     if len(sys.argv) != 4:
         print('Usage: python extg2ssat.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file]', file=sys.stderr)
@@ -246,10 +339,8 @@ if __name__ == '__main__':
     adverse = names[1]
     path = sys.argv[2]
     outfile = sys.argv[3]
-
+    
     base_encoding(name)
-    
-    
 
     # single-player game
     if randp == '' and adverse == '':
@@ -259,15 +350,33 @@ if __name__ == '__main__':
         exit(0)
     
     filelist = ['base_encoding.lp', path]
-    
+
+    horizon = get_horizon(path)
+
     if randp != '':
+        turns = {}
+        #if turnfile != '':
+        #    turns = get_randturn(turnfile, horizon)
+        candidate = get_o_noop(path, horizon, 2, randp)
+        for v in candidate:
+            turns[v[0]] = (v[1], v[1])
         moveR = get_player_action(randp, path)
-        model_random(randp, moveR)
+        #print(turns)
+        model_random(randp, moveR, turns, horizon)
         filelist.append('encoding_random.lp')
     
     if adverse != '':
+        turns = set()
+        #if turnfile != '':
+        #    turns = get_advturn(turnfile, horizon)
+        candidate = get_o_noop(path, horizon, 2, adverse)
+        #print(candidate)
+        for v in candidate:
+            if v[1] == 1:
+                turns.add(v[0])
+            #turns[v[0]] = (v[1], v[1])
         moveL = get_player_action(adverse, path)
-        model_adverse(adverse, moveL)
+        model_adverse(adverse, moveL, turns, horizon)
         filelist.append('encoding_adverse.lp')
 
 
