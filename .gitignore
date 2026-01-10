@@ -1,4 +1,5 @@
 *.dimacs
+*.sdimacs
 try.lp
 quantification.lp
 encoding_smodels.txt
