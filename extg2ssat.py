@@ -67,10 +67,10 @@ def model_random(randp, moveR):
     
     for i in range(2, tol + 1):
         if i == 1:
-            print(f'does({randp}, A, T) :- tol_act(1, T), not terminated(T), legal({randp}, A, T), legal_id(A, 1, T).', file=f)
+            print(f':-not does({randp}, A, T), tol_act(1, T), not terminated(T), legal({randp}, A, T), legal_id(A, 1, T).', file=f)
         else:
             for j in range(i, 0, -1):
-                print(f'does({randp}, A, T) :- tol_act({i}, T), legal({randp}, A, T), legal_id(A, {j}, T), not terminated(T), mtdom(T)', end='', file=f)
+                print(f':- not does({randp}, A, T), tol_act({i}, T), legal({randp}, A, T), legal_id(A, {j}, T), not terminated(T), mtdom(T)', end='', file=f)
                 for k in range(i, j, -1):
                     print(f', not moveR({randp}, {k}, T)', file=f, end='')
                 if j != 1:
@@ -97,7 +97,7 @@ def model_adverse(adv, moveL):
     j = 0
     for i in range(0, 1 << tol):
         if j < len(moveL):
-            print(f'does({adv}, {moveL[j]}, T) :- ', end='', file=f)
+            print(f':- not does({adv}, {moveL[j]}, T), ', end='', file=f)
             for k in range(0, tol):
                 if ((i >> k) & 1) == 0:
                     print('not ', end='', file=f)

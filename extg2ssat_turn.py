@@ -78,7 +78,7 @@ def model_random(randp, moveR, turns, horizon):
             high = turns[time][1]
         for i in range(low, high + 1):
             for j in range(i, 0, -1):
-                print(f'does({randp}, A, {time}) :- tol_act({i}, {time}), legal({randp}, A, {time}), legal_id(A, {j}, {time}), not terminated({time})', end='', file=f)
+                print(f':- not does({randp}, A, {time}),  tol_act({i}, {time}), legal({randp}, A, {time}), legal_id(A, {j}, {time}), not terminated({time})', end='', file=f)
                 for k in range(i, j, -1):
                     print(f', not moveR({randp}, {k}, {time})', file=f, end='')
                 if j != 1:
@@ -110,7 +110,7 @@ def model_adverse(adv, moveL, turns, horizon):
             j = 0
             for i in range(0, 1 << tol):
                 if j < len(moveL):
-                    print(f'does({adv}, {moveL[j]}, {time}) :- ', end='', file=f)
+                    print(f':- not does({adv}, {moveL[j]}, {time}), ', end='', file=f)
                     for k in range(0, tol):
                         if ((i >> k) & 1) == 0:
                             print('not ', end='', file=f)
