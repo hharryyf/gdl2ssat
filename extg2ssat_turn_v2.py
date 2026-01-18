@@ -36,6 +36,7 @@ def get_player_action(player, path):
     d = deque(moveR)
     d.rotate(len(d) // 2)
     moveR = list(d)
+    
     return moveR
 
 def base_encoding(name):
@@ -50,7 +51,74 @@ def base_encoding(name):
     print(f'_exists(T * 5 - 4, does({name}, A, T)) :- mtdom(T), input({name}, A).', file=f)
     print(file=f)
     f.close()
-    
+
+def generate_turn(actnum, t, r, f):
+    # generate the rules that can form a uniform distribution
+    # it is known that actnum > 1
+    if actnum == 1:
+        return
+    p2 = [1]
+    idx = {}
+    idx[1] = 0
+    while p2[-1] * 2 <= actnum:
+        idx[p2[-1] * 2] = len(p2)
+        p2.append(p2[-1] * 2)
+
+    stvar = []
+    # create the stochastic variables
+    i = len(p2) - 1
+    while actnum > 1:
+        if actnum in p2:
+            break
+        else:
+            if actnum < p2[i]:
+                i -= 1
+            else:
+                stvar.append((actnum, actnum - p2[i]))
+                actnum -= p2[i]
+    for i in range(len(p2)-1):
+        print('{' + f'moveR({r}, {i+1}, {t})' + '}.', file=f)
+        print(f'_chance({5 * t - 1},1, 2, moveR({r},{i+1},{t})).', file=f)
+    for i in range(len(stvar)):
+        print('{' + f'moveR({r}, {i+len(p2)}, {t})' + '}.', file=f)
+        print(f'_chance({5 * t - 1}, {stvar[i][1]}, {stvar[i][0]},moveR({r},{i+len(p2)},{t})).', file=f)
+    # generate the rules for redirection
+    act = 1
+    for i in range(0, len(stvar)):
+        ss = ''
+        for j in range(0, i):
+            ss += f', moveR({r}, {j+len(p2)}, {t})'
+        ss += f', not moveR({r}, {i+len(p2)}, {t})'
+        for j in range(stvar[i][0] - stvar[i][1]):
+            pref = f':- not does({r}, A, {t}), legal({r}, A, {t}), legal_id(A, {act}, {t}), not terminated({t}) {ss}'
+            curr = ''
+            for k in range(0, idx[stvar[i][0] - stvar[i][1]]):
+                if ((j >> k) & 1) == 1:
+                    curr += f', moveR({r},{k+1},{t})'
+                else:
+                    curr += f', not moveR({r},{k+1},{t})'
+
+            print(f'{pref} {curr}.', file=f)
+            act += 1
+
+    ss = ''
+    for i in range(0, len(stvar)):
+        ss += f', moveR({r}, {i+len(p2)}, {t})'
+    tol = p2[-1]
+    if len(stvar) != 0:
+        tol = stvar[-1][1]
+    for j in range(0, tol):  
+        pref = f':- not does({r}, A, {t}), legal({r}, A, {t}), legal_id(A, {act}, {t}), not terminated({t}) {ss}'
+        curr = ''
+        for k in range(0, idx[tol]):
+            if ((j >> k) & 1) == 1:
+                curr += f', moveR({r},{k+1},{t})'
+            else:
+                curr += f', not moveR({r},{k+1},{t})'
+        act += 1
+        print(f'{pref} {curr}.', file=f)    
+
+
 def model_random(randp, moveR, turns, horizon):
     tol = len(moveR)
     f = open('encoding_random.lp', 'w')
@@ -71,7 +139,6 @@ def model_random(randp, moveR, turns, horizon):
     print(f'tol_act(N, T) :- legal_id(A, N, T), back(A).', file=f)
     print(file=f)
     # the probablistic variable (1/i,(i-1)/i)  for the random player
-    print('{moveR(' + f'{randp}, I, T)' +'} :- ordom(I, T), I > 1.', file=f)
     
     for time in range(1, horizon + 1):
         low = 2
@@ -79,18 +146,24 @@ def model_random(randp, moveR, turns, horizon):
         if time in turns:
             low = max(turns[time][0], 2)
             high = turns[time][1]
-        for i in range(low, high + 1):
-            for j in range(i, 0, -1):
-                print(f':- not does({randp}, A, {time}),  tol_act({i}, {time}), legal({randp}, A, {time}), legal_id(A, {j}, {time}), not terminated({time})', end='', file=f)
-                for k in range(i, j, -1):
-                    print(f', not moveR({randp}, {k}, {time})', file=f, end='')
-                if j != 1:
-                    print(f', moveR({randp}, {j}, {time}).', file=f)
-                else:
-                    print('.', file=f)
+        
+        if time in turns and low == high:
+            generate_turn(low, time, randp, f)
+        else:
+            print('{moveR(' + f'{randp}, I, {time})' +'}' + f':- ordom(I, {time}), I > 1.', file=f)
+            print(f'_chance({time} * 5 - 1, 1, I, moveR({randp}, I, {time})) :- ordom(I, {time}), I > 1.', file=f)
+            for i in range(low, high + 1):
+                for j in range(i, 0, -1):
+                    print(f':- not does({randp}, A, {time}),  tol_act({i}, {time}), legal({randp}, A, {time}), legal_id(A, {j}, {time}), not terminated({time})', end='', file=f)
+                    for k in range(i, j, -1):
+                        print(f', not moveR({randp}, {k}, {time})', file=f, end='')
+                    if j != 1:
+                        print(f', moveR({randp}, {j}, {time}).', file=f)
+                    else:
+                        print('.', file=f)
+        
     print(file=f)
     print('% Basic quantifiers', file=f)
-    print(f'_chance(T * 5 - 1, 1, I, moveR({randp}, I, T)) :- mtdom(T), ordom(I, T), I > 1.', file=f)
     print(f'_exists(T * 5, does({randp}, A, T)) :- mtdom(T), input({randp}, A).', file=f)
     f.close()
 
@@ -330,8 +403,8 @@ def get_advturn(turnfile, horizon):
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print('Usage: python extg2ssat.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file]', file=sys.stderr)
+    if len(sys.argv) != 4 and len(sys.argv) != 5:
+        print('Usage: python extg2ssat.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file] [Optional: turn-file]', file=sys.stderr)
         exit(1)
 
 
@@ -342,7 +415,10 @@ if __name__ == '__main__':
     adverse = names[1]
     path = sys.argv[2]
     outfile = sys.argv[3]
-    
+    turnfile = ''
+    if len(sys.argv) == 5:
+        turnfile = sys.argv[4]
+
     base_encoding(name)
 
     # single-player game
@@ -365,6 +441,14 @@ if __name__ == '__main__':
             turns[v[0]] = (v[1], v[1])
         moveR = get_player_action(randp, path)
         #print(turns)
+        if turnfile != '':
+            f = open(turnfile, 'r')
+            for line in f:
+                line = line.split(',')
+                if len(line) != 0:
+                    line = list(map(int, line))
+                    turns[line[0]] = (line[1], line[2])
+            f.close()
         model_random(randp, moveR, turns, horizon)
         filelist.append('encoding_random.lp')
     
