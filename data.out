@@ -1182,3 +1182,11 @@
 <td>70.7017</td>
 <td>UNSAT</td>
 </tr>
+<tr>
+<td>out.sdimacs</td>
+<td>4060</td>
+<td>7218</td>
+<td>140</td>
+<td>0.017969</td>
+<td>UNSAT</td>
+</tr>
