@@ -1,0 +1,157 @@
+(role xplayer)
+(role oplayer)
+(role random)
+
+(<= (base (round 0)))
+(<= (base (round ?y)) (succ ?x ?y))
+(<= (base (heap ?x 0)) (pile ?x))
+(<= (base (heap ?x ?y)) (pile ?x) (succ ?x ?y))
+(<= (base (control xplayer)))
+(<= (base (control oplayer)))
+(<= (base (phase random)))
+(<= (base (phase player)))
+
+(<= (input xplayer (reduce ?x 1)) (pile ?x))
+(<= (input xplayer (reduce ?x 2)) (pile ?x))
+(<= (input oplayer (reduce ?x 1)) (pile ?x))
+(<= (input oplayer (reduce ?x 2)) (pile ?x))
+(<= (input random (add ?x 1)) (pile ?x))
+(<= (input ?p noop) (role ?p))
+
+(<= (init (heap ?x ?y)) (height ?x ?y))
+
+(init (control xplayer))
+(init (phase player))
+(init (round 0))
+
+(<= (legal xplayer noop)
+(true (control oplayer)))
+
+(<= (legal xplayer noop)
+(true (phase random)))
+
+(<= (legal oplayer noop)
+(true (control xplayer)))
+
+(<= (legal oplayer noop)
+(true (phase random)))
+
+
+(<= (legal ?p noop)
+(true (control ?x))
+(role ?p)
+(distinct ?x ?p))
+
+(<= (legal random (add ?x 1))
+(true (phase random)))
+
+(<= (legal random noop))
+
+
+(<= (legal ?p (reduce ?x 1))
+(true (heap ?x ?m))
+(true (control ?p))
+(true (phase player))
+(small 0 ?m))
+
+(<= (legal ?p (reduce ?x 2))
+(true (heap ?x ?m))
+(true (control ?p))
+(true (phase player))
+(small 1 ?m))
+
+(<= (next (round ?x))
+(true (round ?x))
+(true (phase player)))
+
+(<= (next (round ?y))
+(true (round ?x))
+(true (phase random))
+(true (control oplayer))
+(succ ?x ?y))
+
+(<= (next (phase player))
+(true (phase random)))
+
+(<= (next (phase random))
+(true (phase player)))
+
+(<= (next (control ?p))
+(true (control ?p))
+(true (phase player)))
+
+(<= (next (control ?q))
+(true (control ?p))
+(true (phase random))
+(next_player ?p ?q))
+
+(<= (next (heap ?x ?m))
+(does ?p (reduce ?x 1))
+(true (heap ?x ?n))
+(succ ?m ?n))
+
+(<= (next (heap ?x ?m))
+(does ?p (reduce ?x 2))
+(true (heap ?x ?n))
+(succ ?m ?z)
+(succ ?z ?n))
+
+(<= (next (heap ?x ?m))
+(does random (add ?x 1))
+(true (heap ?x ?n))
+(succ ?n ?m))
+
+(<= (next (heap ?x ?n))
+(does random (add ?y 1))
+(true (heap ?x ?n))
+(distinct ?x ?y))
+
+(<= (next (heap ?x ?n))
+(does random noop)
+(true (phase random))
+(true (heap ?x ?n)))
+
+(<= (next (heap ?x ?n))
+(does ?p (reduce ?y ?k))
+(true (heap ?x ?n))
+(distinct ?x ?y))
+
+
+(<= open
+(true (heap ?x ?p))
+(small 0 ?p))
+
+(<= terminal
+(not open))
+
+(<= (goal ?p 100)
+(true (control ?p)))
+
+(<= (goal ?p 0)
+(true (control ?p1))
+(next_player ?p ?p1))
+
+(next_player xplayer oplayer)
+(next_player oplayer xplayer)
+
+(pile a)
+
+(<= terminal (true (round 6)))
+
+
+(height a 6)
+
+(<= (small ?a ?b)
+(succ ?a ?c)
+(small ?c ?b))
+
+(<= (small ?a ?b)
+(succ ?a ?b))
+
+(succ 0 1)
+(succ 1 2)
+(succ 2 3)
+(succ 3 4)
+(succ 4 5)
+(succ 5 6)
+

@@ -2,7 +2,7 @@
 #include <SWI-Prolog.h>
 #include <SWI-cpp2.h>
 #include <SWI-cpp2.cpp>
-
+#include <chrono>
 std::string player;
 std::string otherp;
 std::string randp;
@@ -16,6 +16,7 @@ std::map<std::vector<std::string>, std::pair<int, double>> table;
 */ 
 int cnt = 0, add_cnt = 0, remove_cnt = 0, iteration = 0, remove_state = 0;
 bool role_ok() {
+    PlFrame frame;
     PlTermv av(1);
     PlQuery q("role", av);
     std::set<std::string> role;
@@ -38,6 +39,7 @@ bool role_ok() {
 }
 
 std::tuple<std::set<std::string>,std::set<std::string>,std::set<std::string>> get_legal() {
+    PlFrame frame;
     PlTermv av(2);
     PlQuery q("legal", av);
     std::set<std::string> our;
@@ -67,6 +69,7 @@ std::tuple<std::set<std::string>,std::set<std::string>,std::set<std::string>> ge
 }
 
 bool is_terminal() {
+    PlFrame frame;
     PlTermv av(0);
     PlQuery q("terminal", av);
     try {
@@ -134,7 +137,7 @@ std::vector<std::string> query_next() {
 std::vector<std::string> query_init() {
     std::vector<std::string> result;
     std::set<std::string> st;
-
+    PlFrame frame;
     PlTermv av(1);
     PlQuery q("init", av);
     
@@ -156,6 +159,7 @@ std::vector<std::string> query_init() {
 }
 
 void add_facts(std::vector<std::string> &facts) {
+    PlFrame frame;
     for (auto &s : facts) {
         //std::cout << "add fact: " << s << std::endl;
         std::string res = "assertz(";
@@ -174,6 +178,7 @@ void add_facts(std::vector<std::string> &facts) {
 }
 
 void remove_facts(std::vector<std::string> &facts) {
+    PlFrame frame;
     for (auto &s : facts) {
         //std::cout << "remove fact: " << s << std::endl;
         std::string res = "retractall(";
@@ -196,10 +201,14 @@ void remove_facts(std::vector<std::string> &facts) {
 }
 
 double minimax(int depth, std::vector<std::string> &s_true, char *argv[]) {
+    // if (cnt > 20000) {
+    //     cnt = 0;
+    //     Plx_cleanup(1);
+    //     Plx_initialise(2, argv);
+    // }
     if (cnt > 20000) {
+        std::cout << "States: " << iteration << std::endl;
         cnt = 0;
-        Plx_cleanup(1);
-        Plx_initialise(2, argv);
     }
     add_facts(s_true);
     
@@ -331,12 +340,19 @@ double minimax(int depth, std::vector<std::string> &s_true, char *argv[]) {
     }
 
     if (table.size() >= 1000000) {
-        while ((int) table.size() >= 500000) {
-            auto v = *table.begin();
-            table.erase(v.first);
-        }
-
-        remove_state += 500000;
+        auto it = table.begin();
+        while (it != table.end()) {
+            if (rand() % 2 == 0) {
+                it = table.erase(it);
+                remove_state++;
+            } else {
+                ++it;
+            }
+    }
+        //while ((int) table.size() >= 500000) {
+        //    auto v = *table.begin();
+        //    table.erase(v.first);
+        //}
     }
 
     if (table.find(s_true) == table.end()) {
@@ -362,7 +378,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     }
 
-    
+    srand(0);
 
     Plx_initialise(2, argv);
     int depth = atoi(argv[3]);
@@ -397,11 +413,18 @@ int main(int argc, char *argv[]) {
 
     cnt = 0;
     auto s_init = query_init();
-    clock_t start = clock();
+    auto start = std::chrono::steady_clock::now();
     auto res = minimax(depth, s_init, argv);
-    clock_t end = clock();
-    auto tt = 1.0 * (end - start) / CLOCKS_PER_SEC;
-    printf("Nodes: %d, Time: %.2lfs, nps: %.2lf, TT size: %d\n", iteration, tt, round(1.0 * iteration / tt), remove_state + (int) table.size());
+    auto end = std::chrono::steady_clock::now();
+    std::chrono::duration<double> tt = end - start;
+    printf("Nodes: %d, Time: %.2lfs, nps: %.2lf, TT size: %d\n", iteration, tt.count(), round(1.0 * iteration / tt.count()), remove_state + (int) table.size());
+    for (auto &v : table) {
+        for (auto sst : v.first) {
+            //printf("%s ", sst.c_str());
+            std::cout << sst << " ";
+        }
+        printf("\n");
+    }
     std::cout << std::endl;
     std::cout << res << std::endl;
     PL_halt(0);

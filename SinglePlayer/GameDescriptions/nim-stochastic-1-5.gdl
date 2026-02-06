@@ -93,8 +93,8 @@
 (<= (next (heap ?x ?m))
 (does ?p (reduce ?x 2))
 (true (heap ?x ?n))
-(succ ?m ?x)
-(succ ?x ?n))
+(succ ?m ?z)
+(succ ?z ?n))
 
 (<= (next (heap ?x ?m))
 (does random (add ?x 1))
@@ -124,10 +124,10 @@
 (<= terminal
 (not open))
 
-(<= (goal ?p 0)
+(<= (goal ?p 100)
 (true (control ?p)))
 
-(<= (goal ?p 100)
+(<= (goal ?p 0)
 (true (control ?p1))
 (next_player ?p ?p1))
 
@@ -138,9 +138,6 @@
 
 (<= terminal (true (round 5)))
 
-(<= (goal ?p 0)
-open
-(role ?p))
 
 (height a 5)
 

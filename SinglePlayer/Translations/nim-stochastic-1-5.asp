@@ -3,56 +3,55 @@ role(xplayer).
 role(oplayer).
 role(random).
 base(round(0)).
-base(round(X37388)) :- succ(X37392, X37388), domdomain(13, X37392), domdomain(14, X37388), domdomain(8, X37388).
-base(heap(X37388, 0)) :- pile(X37388), domdomain(1, X37388), domdomain(7, X37388).
-base(heap(X37388, X37389)) :- pile(X37388), succ(X37388, X37389), domdomain(13, X37388), domdomain(14, X37389), domdomain(1, X37388), domdomain(7, X37388), domdomain(8, X37389).
+base(round(X36946)) :- succ(X36950, X36946), domdomain(13, X36950), domdomain(14, X36946), domdomain(8, X36946).
+base(heap(X36946, 0)) :- pile(X36946), domdomain(1, X36946), domdomain(7, X36946).
+base(heap(X36946, X36947)) :- pile(X36946), succ(X36946, X36947), domdomain(13, X36946), domdomain(14, X36947), domdomain(1, X36946), domdomain(7, X36946), domdomain(8, X36947).
 base(control(xplayer)).
 base(control(oplayer)).
 base(phase(random)).
 base(phase(player)).
-input(xplayer, reduce(X37389, 1)) :- pile(X37389), domdomain(1, X37389), domdomain(7, X37389).
-input(xplayer, reduce(X37389, 2)) :- pile(X37389), domdomain(1, X37389), domdomain(7, X37389).
-input(oplayer, reduce(X37389, 1)) :- pile(X37389), domdomain(1, X37389), domdomain(7, X37389).
-input(oplayer, reduce(X37389, 2)) :- pile(X37389), domdomain(1, X37389), domdomain(7, X37389).
-input(random, add(X37389, 1)) :- pile(X37389), domdomain(1, X37389).
-input(X37386, noop) :- role(X37386), domdomain(5, X37386).
-true(heap(X37388, X37389), 1) :- height(X37388, X37389), domdomain(1, X37388), domdomain(9, X37389), domdomain(7, X37388), domdomain(8, X37389).
+input(xplayer, reduce(X36947, 1)) :- pile(X36947), domdomain(1, X36947), domdomain(7, X36947).
+input(xplayer, reduce(X36947, 2)) :- pile(X36947), domdomain(1, X36947), domdomain(7, X36947).
+input(oplayer, reduce(X36947, 1)) :- pile(X36947), domdomain(1, X36947), domdomain(7, X36947).
+input(oplayer, reduce(X36947, 2)) :- pile(X36947), domdomain(1, X36947), domdomain(7, X36947).
+input(random, add(X36947, 1)) :- pile(X36947), domdomain(1, X36947).
+input(X36944, noop) :- role(X36944), domdomain(5, X36944).
+true(heap(X36946, X36947), 1) :- height(X36946, X36947), domdomain(1, X36946), domdomain(9, X36947), domdomain(7, X36946), domdomain(8, X36947).
 true(control(xplayer), 1).
 true(phase(player), 1).
 true(round(0), 1).
-legal(xplayer, noop, X37395) :- true(control(oplayer), X37395), tdom(X37395).
-legal(xplayer, noop, X37395) :- true(phase(random), X37395), tdom(X37395).
-legal(oplayer, noop, X37395) :- true(control(xplayer), X37395), tdom(X37395).
-legal(oplayer, noop, X37395) :- true(phase(random), X37395), tdom(X37395).
-legal(X37386, noop, X37404) :- true(control(X37393), X37404), role(X37386), X37393 != X37386, domdomain(4, X37393), tdom(X37404), domdomain(5, X37386).
-legal(random, add(X37389, 1), X37398) :- true(phase(random), X37398), tdom(X37398), domdomain(1, X37389).
-legal(random, noop, X37389) :- tdom(X37389).
-legal(X37386, reduce(X37389, 1), X37416) :- true(heap(X37389, X37397), X37416), true(control(X37386), X37416), true(phase(player), X37416), small(0, X37397), domdomain(14, X37397), domdomain(4, X37386), domdomain(8, X37397), tdom(X37416), domdomain(5, X37386), domdomain(7, X37389).
-legal(X37386, reduce(X37389, 2), X37416) :- true(heap(X37389, X37397), X37416), true(control(X37386), X37416), true(phase(player), X37416), small(1, X37397), domdomain(14, X37397), domdomain(4, X37386), domdomain(8, X37397), tdom(X37416), domdomain(5, X37386), domdomain(7, X37389).
-true(round(X37388), X37402 + 1) :- true(round(X37388), X37402), true(phase(player), X37402), mtdom(X37402), domdomain(8, X37388).
-true(round(X37388), X37413 + 1) :- true(round(X37394), X37413), true(phase(random), X37413), true(control(oplayer), X37413), succ(X37394, X37388), domdomain(13, X37394), domdomain(14, X37388), domdomain(8, X37394), mtdom(X37413), domdomain(8, X37388).
-true(phase(player), X37396 + 1) :- true(phase(random), X37396), mtdom(X37396).
-true(phase(random), X37396 + 1) :- true(phase(player), X37396), mtdom(X37396).
-true(control(X37388), X37402 + 1) :- true(control(X37388), X37402), true(phase(player), X37402), mtdom(X37402), domdomain(4, X37388).
-true(control(X37388), X37407 + 1) :- true(control(X37394), X37407), true(phase(random), X37407), nextXplayer(X37394, X37388), domdomain(4, X37394), mtdom(X37407), domdomain(4, X37388).
-true(heap(X37388, X37389), X37411 + 1) :- does(X37393, reduce(X37388, 1), X37411), true(heap(X37388, X37404), X37411), succ(X37389, X37404), domdomain(13, X37389), domdomain(14, X37404), domdomain(8, X37404), domdomain(5, X37393), mtdom(X37411), domdomain(7, X37388), domdomain(8, X37389).
-true(heap(X37388, X37389), X37416 + 1) :- does(X37393, reduce(X37388, 2), X37416), true(heap(X37388, X37404), X37416), succ(X37389, X37388), succ(X37388, X37404), domdomain(13, X37388), domdomain(14, X37404), domdomain(13, X37389), domdomain(14, X37388), domdomain(8, X37404), domdomain(5, X37393), mtdom(X37416), domdomain(7, X37388), domdomain(8, X37389).
-true(heap(X37388, X37389), X37411 + 1) :- does(random, add(X37388, 1), X37411), true(heap(X37388, X37404), X37411), succ(X37404, X37389), domdomain(13, X37404), domdomain(14, X37389), domdomain(8, X37404), domdomain(1, X37388), mtdom(X37411), domdomain(7, X37388), domdomain(8, X37389).
-true(heap(X37388, X37389), X37411 + 1) :- does(random, add(X37396, 1), X37411), true(heap(X37388, X37389), X37411), X37388 != X37396, domdomain(1, X37396), mtdom(X37411), domdomain(7, X37388), domdomain(8, X37389).
-true(heap(X37388, X37389), X37409 + 1) :- does(random, noop, X37409), true(phase(random), X37409), true(heap(X37388, X37389), X37409), mtdom(X37409), domdomain(7, X37388), domdomain(8, X37389).
-true(heap(X37388, X37389), X37411 + 1) :- does(X37393, reduce(X37396, X37397), X37411), true(heap(X37388, X37389), X37411), X37388 != X37396, domdomain(5, X37393), domdomain(7, X37396), domdomain(12, X37397), mtdom(X37411), domdomain(7, X37388), domdomain(8, X37389).
-open(X37398) :- true(heap(X37390, X37391), X37398), small(0, X37391), domdomain(14, X37391), domdomain(7, X37390), domdomain(8, X37391), tdom(X37398).
-terminal(X37390) :- not open(X37390), tdom(X37390).
-goal(X37386, 0, X37395) :- true(control(X37386), X37395), domdomain(4, X37386), tdom(X37395), domdomain(5, X37386).
-goal(X37386, 100, X37400) :- true(control(X37393), X37400), nextXplayer(X37386, X37393), domdomain(4, X37386), domdomain(4, X37393), tdom(X37400), domdomain(5, X37386).
+legal(xplayer, noop, X36953) :- true(control(oplayer), X36953), tdom(X36953).
+legal(xplayer, noop, X36953) :- true(phase(random), X36953), tdom(X36953).
+legal(oplayer, noop, X36953) :- true(control(xplayer), X36953), tdom(X36953).
+legal(oplayer, noop, X36953) :- true(phase(random), X36953), tdom(X36953).
+legal(X36944, noop, X36962) :- true(control(X36951), X36962), role(X36944), X36951 != X36944, domdomain(4, X36951), tdom(X36962), domdomain(5, X36944).
+legal(random, add(X36947, 1), X36956) :- true(phase(random), X36956), tdom(X36956), domdomain(1, X36947).
+legal(random, noop, X36947) :- tdom(X36947).
+legal(X36944, reduce(X36947, 1), X36974) :- true(heap(X36947, X36955), X36974), true(control(X36944), X36974), true(phase(player), X36974), small(0, X36955), domdomain(14, X36955), domdomain(4, X36944), domdomain(8, X36955), tdom(X36974), domdomain(5, X36944), domdomain(7, X36947).
+legal(X36944, reduce(X36947, 2), X36974) :- true(heap(X36947, X36955), X36974), true(control(X36944), X36974), true(phase(player), X36974), small(1, X36955), domdomain(14, X36955), domdomain(4, X36944), domdomain(8, X36955), tdom(X36974), domdomain(5, X36944), domdomain(7, X36947).
+true(round(X36946), X36960 + 1) :- true(round(X36946), X36960), true(phase(player), X36960), mtdom(X36960), domdomain(8, X36946).
+true(round(X36946), X36971 + 1) :- true(round(X36952), X36971), true(phase(random), X36971), true(control(oplayer), X36971), succ(X36952, X36946), domdomain(13, X36952), domdomain(14, X36946), domdomain(8, X36952), mtdom(X36971), domdomain(8, X36946).
+true(phase(player), X36954 + 1) :- true(phase(random), X36954), mtdom(X36954).
+true(phase(random), X36954 + 1) :- true(phase(player), X36954), mtdom(X36954).
+true(control(X36946), X36960 + 1) :- true(control(X36946), X36960), true(phase(player), X36960), mtdom(X36960), domdomain(4, X36946).
+true(control(X36946), X36965 + 1) :- true(control(X36952), X36965), true(phase(random), X36965), nextXplayer(X36952, X36946), domdomain(4, X36952), mtdom(X36965), domdomain(4, X36946).
+true(heap(X36946, X36947), X36969 + 1) :- does(X36951, reduce(X36946, 1), X36969), true(heap(X36946, X36962), X36969), succ(X36947, X36962), domdomain(13, X36947), domdomain(14, X36962), domdomain(8, X36962), domdomain(5, X36951), mtdom(X36969), domdomain(7, X36946), domdomain(8, X36947).
+true(heap(X36946, X36947), X36974 + 1) :- does(X36951, reduce(X36946, 2), X36974), true(heap(X36946, X36962), X36974), succ(X36947, X36967), succ(X36967, X36962), domdomain(13, X36967), domdomain(14, X36962), domdomain(13, X36947), domdomain(14, X36967), domdomain(8, X36962), domdomain(5, X36951), mtdom(X36974), domdomain(7, X36946), domdomain(8, X36947).
+true(heap(X36946, X36947), X36969 + 1) :- does(random, add(X36946, 1), X36969), true(heap(X36946, X36962), X36969), succ(X36962, X36947), domdomain(13, X36962), domdomain(14, X36947), domdomain(8, X36962), domdomain(1, X36946), mtdom(X36969), domdomain(7, X36946), domdomain(8, X36947).
+true(heap(X36946, X36947), X36969 + 1) :- does(random, add(X36954, 1), X36969), true(heap(X36946, X36947), X36969), X36946 != X36954, domdomain(1, X36954), mtdom(X36969), domdomain(7, X36946), domdomain(8, X36947).
+true(heap(X36946, X36947), X36967 + 1) :- does(random, noop, X36967), true(phase(random), X36967), true(heap(X36946, X36947), X36967), mtdom(X36967), domdomain(7, X36946), domdomain(8, X36947).
+true(heap(X36946, X36947), X36969 + 1) :- does(X36951, reduce(X36954, X36955), X36969), true(heap(X36946, X36947), X36969), X36946 != X36954, domdomain(5, X36951), domdomain(7, X36954), domdomain(12, X36955), mtdom(X36969), domdomain(7, X36946), domdomain(8, X36947).
+open(X36956) :- true(heap(X36948, X36949), X36956), small(0, X36949), domdomain(14, X36949), domdomain(7, X36948), domdomain(8, X36949), tdom(X36956).
+terminal(X36948) :- not open(X36948), tdom(X36948).
+goal(X36944, 100, X36953) :- true(control(X36944), X36953), tdom(X36953), domdomain(4, X36944).
+goal(X36944, 0, X36958) :- true(control(X36951), X36958), nextXplayer(X36944, X36951), domdomain(4, X36951), tdom(X36958), domdomain(4, X36944).
 nextXplayer(xplayer, oplayer).
 nextXplayer(oplayer, xplayer).
 pile(a).
-terminal(X37392) :- true(round(5), X37392), tdom(X37392).
-goal(X37386, 0, X37395) :- open(X37395), role(X37386), tdom(X37395), domdomain(5, X37386).
+terminal(X36950) :- true(round(5), X36950), tdom(X36950).
 height(a, 5).
-small(X37386, X37387) :- succ(X37386, X37392), small(X37392, X37387), domdomain(13, X37392), domdomain(14, X37392), domdomain(13, X37386), domdomain(14, X37387).
-small(X37386, X37387) :- succ(X37386, X37387), domdomain(13, X37386), domdomain(14, X37387).
+small(X36944, X36945) :- succ(X36944, X36950), small(X36950, X36945), domdomain(13, X36950), domdomain(14, X36950), domdomain(13, X36944), domdomain(14, X36945).
+small(X36944, X36945) :- succ(X36944, X36945), domdomain(13, X36944), domdomain(14, X36945).
 succ(0, 1).
 succ(1, 2).
 succ(2, 3).
@@ -76,7 +75,6 @@ domdomain(7, 1).
 domdomain(7, 2).
 domdomain(7, 3).
 domdomain(7, 4).
-domdomain(7, 5).
 domdomain(7, a).
 domdomain(8, 0).
 domdomain(8, 1).

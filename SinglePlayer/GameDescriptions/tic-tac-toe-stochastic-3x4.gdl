@@ -1,0 +1,221 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; Tic-Tac-Toe stochastic strictly turn-taking
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Roles
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(role xplayer)
+(role oplayer)
+(role random)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Base & Input
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(xindex 1) (xindex 2) (xindex 3) (yindex 1) (yindex 2) (yindex 3) (yindex 4)
+(<= (base (cell ?x ?y x)) (xindex ?x) (yindex ?y))
+(<= (base (cell ?x ?y o)) (xindex ?x) (yindex ?y))
+(<= (base (prev ?x ?y x)))
+(<= (base (prev ?x ?y o)))
+(<= (base (control ?p)) (role ?p))
+(<= (base (prevplayer xplayer)))
+(<= (base (prevplayer oplayer)))
+
+(<= (input xplayer (mark ?x ?y)) (xindex ?x) (yindex ?y))
+(<= (input oplayer (mark ?x ?y)) (xindex ?x) (yindex ?y))
+(<= (input random (act x 1)))
+(<= (input random (act x 2)))
+(<= (input random (act x 3)))
+(<= (input random (act x 4)))
+(<= (input random (act o 1)))
+(<= (input ?p noop) (role ?p))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Initial State
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(init (control xplayer))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Dynamic Components
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; Cell
+
+(<= (next (prev ?m ?n x))
+(does xplayer (mark ?m ?n)))
+
+(<= (next (prev ?m ?n o))
+(does oplayer (mark ?m ?n)))
+
+
+(<= (next (cell ?m ?n x))
+(does random (act x ?k))
+(true (prev ?m ?n x)))
+
+(<= (next (cell ?m ?n o))
+(does random (act o ?k))
+(true (prev ?m ?n x)))
+
+(<= (next (cell ?m ?n o))
+(does random (act x ?k))
+(true (prev ?m ?n o)))
+
+(<= (next (cell ?m ?n x))
+(does random (act o ?k))
+(true (prev ?m ?n o)))
+
+(<= (next (cell ?m ?n ?w))
+(true (cell ?m ?n ?w)))
+
+
+
+(<= (next (prevplayer oplayer))
+(true (control oplayer)))
+
+(<= (next (control random))
+(true (control oplayer)))
+
+(<= (next (control random))
+(true (control xplayer)))
+
+(<= (next (prevplayer xplayer))
+(true (control xplayer)))
+
+
+
+(<= (next (control xplayer))
+(true (control random))
+(true (prevplayer oplayer)))
+
+(<= (next (control oplayer))
+(true (control random))
+(true (prevplayer xplayer)))
+
+
+(<= open
+(not (true (cell ?m ?n x)))
+(not (true (cell ?m ?n o)))
+(xindex ?m)
+(yindex ?n))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(<= (legal ?w (mark ?x ?y))
+(not (true (cell ?x ?y x)))
+(not (true (cell ?x ?y o)))
+(true (control ?w))
+(distinct ?w random)
+(xindex ?x)
+(yindex ?y))
+
+(<= (legal xplayer noop)
+(true (control oplayer)))
+
+(<= (legal random noop)
+(true (control oplayer)))
+
+(<= (legal random noop)
+(true (control xplayer)))
+
+(<= (legal oplayer noop)
+(true (control xplayer)))
+
+(<= (legal oplayer noop)
+(true (control random)))
+
+(<= (legal xplayer noop)
+(true (control random)))
+
+(<= (legal random (act x 1))
+(true (control random)))
+
+(<= (legal random (act x 2))
+(true (control random)))
+
+(<= (legal random (act x 3))
+(true (control random)))
+
+(<= (legal random (act x 4))
+(true (control random)))
+
+(<= (legal random (act o 1))
+(true (control random)))
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(<= (goal xplayer 100)
+(line x))
+
+(<= (goal xplayer 50)
+(not (line x))
+(not (line o))
+(not open))
+
+(<= (goal xplayer 0)
+(line o))
+
+(<= (goal oplayer 100)
+(line o))
+
+(<= (goal oplayer 50)
+(not (line x))
+(not (line o))
+(not open))
+
+(<= (goal oplayer 0)
+(line x))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(<= terminal
+(line x))
+
+(<= terminal
+(line o))
+
+(<= terminal
+(not open))
+
+(succ 1 2) (succ 2 3) (succ 3 4)
+
+
+
+(<= (line ?x) 
+(true (cell ?z ?y1 ?x))
+(true (cell ?z ?y2 ?x))
+(true (cell ?z ?y3 ?x))
+(succ ?y1 ?y2)
+(succ ?y2 ?y3))
+
+(<= (line ?x) 
+(true (cell ?x1 ?y ?x))
+(true (cell ?x2 ?y ?x))
+(true (cell ?x3 ?y ?x))
+(succ ?x1 ?x2)
+(succ ?x2 ?x3))
+
+(<= (line ?x) 
+(true (cell ?x1 ?y1 ?x))
+(true (cell ?x2 ?y2 ?x))
+(true (cell ?x3 ?y3 ?x))
+(succ ?x1 ?x2)
+(succ ?x2 ?x3)
+(succ ?y1 ?y2)
+(succ ?y2 ?y3))
+
+(<= (line ?x) 
+(true (cell ?x1 ?y1 ?x))
+(true (cell ?x2 ?y2 ?x))
+(true (cell ?x3 ?y3 ?x))
+(succ ?x3 ?x2)
+(succ ?x2 ?x1)
+(succ ?y1 ?y2)
+(succ ?y2 ?y3))
+
+

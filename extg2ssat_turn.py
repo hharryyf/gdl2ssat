@@ -38,16 +38,36 @@ def get_player_action(player, path):
     moveR = list(d)
     return moveR
 
-def base_encoding(name):
+def base_encoding(inputfile, name, adv, horizon):
+
+    def print_integrity(moveX, player, f):
+        print(f':- not terminated(T), mtdom(T)', end='', file=f)
+        for mv in moveX:
+            print(f', not does({player}, {mv}, T)', end='', file=f)
+        print('.', file=f)
+
+        print(f':- does({player},A,T), does({player},B,T), A < B.', file=f)
+
     f = open('base_encoding.lp', 'w')
     print('tdom(T+1) :- mtdom(T). tdom(1).', file=f)
-    print('1 {' + f'does(R, A, T) : input(R, A)' + '} 1 :- role(R), mtdom(T), not terminated(T).', file=f)
+    print('{' + f'does(R, A, T) : input(R, A)' + '} :- role(R), mtdom(T), not terminated(T).', file=f)
+    
+    
+    
+    moveX = get_player_action(name, inputfile)
+    print_integrity(moveX, name, f)
+    for o in adv:
+        moveX = get_player_action(o, inputfile)
+        print_integrity(moveX, o, f)
+    
     print('terminated(T) :- terminal(T).', file=f)
     print('terminated(T+1) :- terminated(T), mtdom(T).', file=f)
     print(':- does(R, A, T), not legal(R, A, T).', file=f)
-    print(':- 0 {terminated(T) : tdom(T)} 0.', file=f)
+    print(f':- not terminated({horizon+1}).', file=f)
+    
     print(f':- not goal({name}, 100, T), terminated(T), not terminated(T-1).', file=f)
     print(f'_exists(T * 5 - 4, does({name}, A, T)) :- mtdom(T), input({name}, A).', file=f)
+
     print(file=f)
     f.close()
     
@@ -331,7 +351,7 @@ def get_advturn(turnfile, horizon):
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print('Usage: python extg2ssat.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file]', file=sys.stderr)
+        print('Usage: python extg2ssat_turn.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file]', file=sys.stderr)
         exit(1)
 
 
@@ -343,8 +363,15 @@ if __name__ == '__main__':
     path = sys.argv[2]
     outfile = sys.argv[3]
     
-    base_encoding(name)
+    horizon = get_horizon(path)
 
+    adv = []
+    if adverse != '':
+        adv.append(adverse)
+    if randp != '':
+        adv.append(randp)
+    base_encoding(path, name, adv, horizon)
+    
     # single-player game
     if randp == '' and adverse == '':
         print('The game is a single-player determinstic game!')
@@ -354,8 +381,7 @@ if __name__ == '__main__':
     
     filelist = ['base_encoding.lp', path]
 
-    horizon = get_horizon(path)
-
+    
     if randp != '':
         turns = {}
         #if turnfile != '':

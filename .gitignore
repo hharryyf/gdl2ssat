@@ -4,5 +4,12 @@ try.lp
 quantification.lp
 encoding_smodels.txt
 extg2plingo.py
+encoding_adverse.lp 
+base_encoding.lp 
+encoding_random.lp 
+out_exist.blif 
+out_univ.blif 
+out.txt 
+SinglePlayer/gen.py 
 
 

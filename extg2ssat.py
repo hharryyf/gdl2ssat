@@ -5,6 +5,29 @@ import clingo
 from sasp2ssat import sasp2ssat
 import queue
 
+
+def get_horizon(file):
+    with open(file, "r") as g:
+        ASP_program = g.read()
+    ASP_program += f'#show.'
+    ASP_program += f'#show mtdom/1.'
+    # Control object is a low-level interface for controlling the grounding/solving process.
+    ctl = clingo.Control(arguments=['-W', 'none'])  # Here you can write the arguments you would pass to clingo by command line.
+    ctl.add("base", [], ASP_program)  # Adds the program to the control object.
+    ctl.ground([("base", [])])  # Grounding...
+
+    # Solving...
+    horizon = 0
+    with ctl.solve(yield_=True) as solution_iterator:
+        for model in solution_iterator:
+            # Model is an instance of clingo.solving.Model class 
+            # Reference: https://potassco.org/clingo/python-api/current/clingo/solving.html#clingo.solving.Model
+            for s in str(model).split():
+                s = re.match(r'mtdom\((\d+)\)', s).group(1)
+                horizon = max(horizon, int(s))
+    
+    return horizon
+
 def get_player_action(player, path):
     moveR = set()
     with open(path, "r") as g:
@@ -34,18 +57,39 @@ def get_player_action(player, path):
 
     return moveR
 
-def base_encoding(name):
+def base_encoding(inputfile, name, adv, horizon):
+
+    def print_integrity(moveX, player, f):
+        print(f':- not terminated(T), mtdom(T)', end='', file=f)
+        for mv in moveX:
+            print(f', not does({player}, {mv}, T)', end='', file=f)
+        print('.', file=f)
+
+        print(f':- does({player},A,T), does({player},B,T), A < B.', file=f)
+
     f = open('base_encoding.lp', 'w')
     print('tdom(T+1) :- mtdom(T). tdom(1).', file=f)
-    print('1 {' + f'does(R, A, T) : input(R, A)' + '} 1 :- role(R), mtdom(T), not terminated(T).', file=f)
+    print('{' + f'does(R, A, T) : input(R, A)' + '} :- role(R), mtdom(T), not terminated(T).', file=f)
+    
+    
+    
+    moveX = get_player_action(name, inputfile)
+    print_integrity(moveX, name, f)
+    for o in adv:
+        moveX = get_player_action(o, inputfile)
+        print_integrity(moveX, o, f)
+    
     print('terminated(T) :- terminal(T).', file=f)
     print('terminated(T+1) :- terminated(T), mtdom(T).', file=f)
     print(':- does(R, A, T), not legal(R, A, T).', file=f)
-    print(':- 0 {terminated(T) : tdom(T)} 0.', file=f)
+    print(f':- not terminated({horizon+1}).', file=f)
+    
     print(f':- not goal({name}, 100, T), terminated(T), not terminated(T-1).', file=f)
     print(f'_exists(T * 5 - 4, does({name}, A, T)) :- mtdom(T), input({name}, A).', file=f)
+
     print(file=f)
     f.close()
+
     
 def model_random(randp, moveR):
     tol = len(moveR)
@@ -247,8 +291,13 @@ if __name__ == '__main__':
     path = sys.argv[2]
     outfile = sys.argv[3]
 
-    base_encoding(name)
-    
+    horizon = get_horizon(path)
+    adv = []
+    if adverse != '':
+        adv.append(adverse)
+    if randp != '':
+        adv.append(randp)
+    base_encoding(path, name, adv, horizon)
     
 
     # single-player game

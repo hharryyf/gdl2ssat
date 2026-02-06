@@ -4,12 +4,14 @@ role(oplayer).
 index(1).
 index(2).
 index(3).
-base(cell(X35236, X35237, b)) :- index(X35236), index(X35237), domdomain(2, X35236), domdomain(2, X35237).
-base(cell(X35236, X35237, x)) :- index(X35236), index(X35237), domdomain(2, X35236), domdomain(2, X35237).
-base(cell(X35236, X35237, o)) :- index(X35236), index(X35237), domdomain(2, X35236), domdomain(2, X35237).
-base(control(X35236)) :- role(X35236), domdomain(4, X35236).
-input(X35234, mark(X35237, X35238)) :- index(X35237), index(X35238), role(X35234), domdomain(4, X35234), domdomain(2, X35237), domdomain(2, X35238).
-input(X35234, noop) :- role(X35234), domdomain(4, X35234).
+succ(1, 2).
+succ(2, 3).
+base(cell(X37931, X37932, b)) :- index(X37931), index(X37932), domdomain(2, X37931), domdomain(2, X37932).
+base(cell(X37931, X37932, x)) :- index(X37931), index(X37932), domdomain(2, X37931), domdomain(2, X37932).
+base(cell(X37931, X37932, o)) :- index(X37931), index(X37932), domdomain(2, X37931), domdomain(2, X37932).
+base(control(X37931)) :- role(X37931), domdomain(4, X37931).
+input(X37929, mark(X37932, X37933)) :- index(X37932), index(X37933), role(X37929), domdomain(4, X37929), domdomain(2, X37932), domdomain(2, X37933).
+input(X37929, noop) :- role(X37929), domdomain(4, X37929).
 true(cell(1, 1, b), 1).
 true(cell(1, 2, b), 1).
 true(cell(1, 3, b), 1).
@@ -20,32 +22,30 @@ true(cell(3, 1, b), 1).
 true(cell(3, 2, b), 1).
 true(cell(3, 3, b), 1).
 true(control(xplayer), 1).
-true(cell(X35236, X35237, x), X35256 + 1) :- does(xplayer, mark(X35236, X35237), X35256), true(cell(X35236, X35237, b), X35256), mtdom(X35256), domdomain(2, X35236), domdomain(2, X35237).
-true(cell(X35236, X35237, o), X35256 + 1) :- does(oplayer, mark(X35236, X35237), X35256), true(cell(X35236, X35237, b), X35256), mtdom(X35256), domdomain(2, X35236), domdomain(2, X35237).
-true(cell(X35236, X35237, X35238), X35253 + 1) :- true(cell(X35236, X35237, X35238), X35253), X35238 != b, mtdom(X35253), domdomain(2, X35236), domdomain(2, X35237), domdomain(3, X35238).
-true(cell(X35236, X35237, b), X35267 + 1) :- does(X35242, mark(X35245, X35246), X35267), true(cell(X35236, X35237, b), X35267), 1 { X35236 != X35245 ; X35237 != X35246 }, domdomain(4, X35242), domdomain(2, X35245), domdomain(2, X35246), mtdom(X35267), domdomain(2, X35236), domdomain(2, X35237).
-true(control(xplayer), X35244 + 1) :- true(control(oplayer), X35244), mtdom(X35244).
-true(control(oplayer), X35244 + 1) :- true(control(xplayer), X35244), mtdom(X35244).
-row(X35234, X35235, X35261) :- true(cell(X35234, 1, X35235), X35261), true(cell(X35234, 2, X35235), X35261), true(cell(X35234, 3, X35235), X35261), tdom(X35261), domdomain(2, X35234), domdomain(3, X35235).
-column(X35234, X35235, X35261) :- true(cell(1, X35234, X35235), X35261), true(cell(2, X35234, X35235), X35261), true(cell(3, X35234, X35235), X35261), tdom(X35261), domdomain(2, X35234), domdomain(3, X35235).
-diagonal(X35234, X35260) :- true(cell(1, 1, X35234), X35260), true(cell(2, 2, X35234), X35260), true(cell(3, 3, X35234), X35260), tdom(X35260), domdomain(3, X35234).
-diagonal(X35234, X35260) :- true(cell(1, 3, X35234), X35260), true(cell(2, 2, X35234), X35260), true(cell(3, 1, X35234), X35260), tdom(X35260), domdomain(3, X35234).
-line(X35234, X35241) :- row(X35238, X35234, X35241), domdomain(2, X35238), tdom(X35241), domdomain(3, X35234).
-line(X35234, X35241) :- column(X35238, X35234, X35241), domdomain(2, X35238), tdom(X35241), domdomain(3, X35234).
-line(X35234, X35240) :- diagonal(X35234, X35240), tdom(X35240), domdomain(3, X35234).
-open(X35242) :- true(cell(X35238, X35239, b), X35242), domdomain(2, X35238), domdomain(2, X35239), tdom(X35242).
-legal(X35234, mark(X35237, X35238), X35254) :- true(cell(X35237, X35238, b), X35254), true(control(X35234), X35254), tdom(X35254), domdomain(4, X35234), domdomain(2, X35237), domdomain(2, X35238).
-legal(xplayer, noop, X35243) :- true(control(oplayer), X35243), tdom(X35243).
-legal(oplayer, noop, X35243) :- true(control(xplayer), X35243), tdom(X35243).
-goal(xplayer, 100, X35241) :- line(x, X35241), tdom(X35241).
-goal(xplayer, 50, X35253) :- not line(x, X35253), not line(o, X35253), not open(X35253), tdom(X35253).
-goal(xplayer, 0, X35241) :- line(o, X35241), tdom(X35241).
-goal(oplayer, 100, X35241) :- line(o, X35241), tdom(X35241).
-goal(oplayer, 50, X35253) :- not line(x, X35253), not line(o, X35253), not open(X35253), tdom(X35253).
-goal(oplayer, 0, X35241) :- line(x, X35241), tdom(X35241).
-terminal(X35238) :- line(x, X35238), tdom(X35238).
-terminal(X35238) :- line(o, X35238), tdom(X35238).
-terminal(X35237) :- not open(X35237), tdom(X35237).
+true(cell(X37931, X37932, x), X37951 + 1) :- does(xplayer, mark(X37931, X37932), X37951), true(cell(X37931, X37932, b), X37951), mtdom(X37951), domdomain(2, X37931), domdomain(2, X37932).
+true(cell(X37931, X37932, o), X37951 + 1) :- does(oplayer, mark(X37931, X37932), X37951), true(cell(X37931, X37932, b), X37951), mtdom(X37951), domdomain(2, X37931), domdomain(2, X37932).
+true(cell(X37931, X37932, X37933), X37948 + 1) :- true(cell(X37931, X37932, X37933), X37948), X37933 != b, mtdom(X37948), domdomain(2, X37931), domdomain(2, X37932), domdomain(3, X37933).
+true(cell(X37931, X37932, b), X37956 + 1) :- does(X37937, mark(X37940, X37941), X37956), true(cell(X37931, X37932, b), X37956), X37931 != X37940, domdomain(4, X37937), domdomain(2, X37940), domdomain(2, X37941), mtdom(X37956), domdomain(2, X37931), domdomain(2, X37932).
+true(cell(X37931, X37932, b), X37956 + 1) :- does(X37937, mark(X37940, X37941), X37956), true(cell(X37931, X37932, b), X37956), X37932 != X37941, domdomain(4, X37937), domdomain(2, X37940), domdomain(2, X37941), mtdom(X37956), domdomain(2, X37931), domdomain(2, X37932).
+true(control(xplayer), X37939 + 1) :- true(control(oplayer), X37939), mtdom(X37939).
+true(control(oplayer), X37939 + 1) :- true(control(xplayer), X37939), mtdom(X37939).
+line(X37929, X37965) :- true(cell(X37935, X37936, X37929), X37965), true(cell(X37935, X37944, X37929), X37965), true(cell(X37935, X37952, X37929), X37965), succ(X37936, X37944), succ(X37944, X37952), domdomain(7, X37944), domdomain(8, X37952), domdomain(7, X37936), domdomain(8, X37944), domdomain(2, X37952), domdomain(2, X37944), domdomain(2, X37935), domdomain(2, X37936), tdom(X37965), domdomain(3, X37929).
+line(X37929, X37965) :- true(cell(X37935, X37936, X37929), X37965), true(cell(X37943, X37936, X37929), X37965), true(cell(X37951, X37936, X37929), X37965), succ(X37935, X37943), succ(X37943, X37951), domdomain(7, X37943), domdomain(8, X37951), domdomain(7, X37935), domdomain(8, X37943), domdomain(2, X37951), domdomain(2, X37943), domdomain(2, X37935), domdomain(2, X37936), tdom(X37965), domdomain(3, X37929).
+line(X37929, X37975) :- true(cell(X37935, X37936, X37929), X37975), true(cell(X37943, X37944, X37929), X37975), true(cell(X37951, X37952, X37929), X37975), succ(X37935, X37943), succ(X37943, X37951), succ(X37936, X37944), succ(X37944, X37952), domdomain(7, X37944), domdomain(8, X37952), domdomain(7, X37936), domdomain(8, X37944), domdomain(7, X37943), domdomain(8, X37951), domdomain(7, X37935), domdomain(8, X37943), domdomain(2, X37951), domdomain(2, X37952), domdomain(2, X37943), domdomain(2, X37944), domdomain(2, X37935), domdomain(2, X37936), tdom(X37975), domdomain(3, X37929).
+line(X37929, X37975) :- true(cell(X37935, X37936, X37929), X37975), true(cell(X37943, X37944, X37929), X37975), true(cell(X37951, X37952, X37929), X37975), succ(X37951, X37943), succ(X37943, X37935), succ(X37936, X37944), succ(X37944, X37952), domdomain(7, X37944), domdomain(8, X37952), domdomain(7, X37936), domdomain(8, X37944), domdomain(7, X37943), domdomain(8, X37935), domdomain(7, X37951), domdomain(8, X37943), domdomain(2, X37951), domdomain(2, X37952), domdomain(2, X37943), domdomain(2, X37944), domdomain(2, X37935), domdomain(2, X37936), tdom(X37975), domdomain(3, X37929).
+open(X37937) :- true(cell(X37933, X37934, b), X37937), domdomain(2, X37933), domdomain(2, X37934), tdom(X37937).
+legal(X37929, mark(X37932, X37933), X37949) :- true(cell(X37932, X37933, b), X37949), true(control(X37929), X37949), tdom(X37949), domdomain(4, X37929), domdomain(2, X37932), domdomain(2, X37933).
+legal(xplayer, noop, X37938) :- true(control(oplayer), X37938), tdom(X37938).
+legal(oplayer, noop, X37938) :- true(control(xplayer), X37938), tdom(X37938).
+goal(xplayer, 100, X37936) :- line(x, X37936), tdom(X37936).
+goal(xplayer, 50, X37948) :- not line(x, X37948), not line(o, X37948), not open(X37948), tdom(X37948).
+goal(xplayer, 0, X37936) :- line(o, X37936), tdom(X37936).
+goal(oplayer, 100, X37936) :- line(o, X37936), tdom(X37936).
+goal(oplayer, 50, X37948) :- not line(x, X37948), not line(o, X37948), not open(X37948), tdom(X37948).
+goal(oplayer, 0, X37936) :- line(x, X37936), tdom(X37936).
+terminal(X37933) :- line(x, X37933), tdom(X37933).
+terminal(X37933) :- line(o, X37933), tdom(X37933).
+terminal(X37932) :- not open(X37932), tdom(X37932).
 domdomain(1, cell).
 domdomain(1, control).
 domdomain(2, 1).
@@ -61,3 +61,7 @@ domdomain(5, 50).
 domdomain(5, 100).
 domdomain(6, mark).
 domdomain(6, noop).
+domdomain(7, 1).
+domdomain(7, 2).
+domdomain(8, 2).
+domdomain(8, 3).
