@@ -278,8 +278,8 @@ def quantifier_shifting(filelist):
     f.close()
 
 if __name__ == '__main__':
-    if len(sys.argv) != 4:
-        print('Usage: python extg2ssat.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file]', file=sys.stderr)
+    if len(sys.argv) != 4 and len(sys.argv) != 5:
+        print('Usage: python extg2ssat.py [player-name,opponent-name,random-name] [path to the extended ASP] [path to the output file] [-b]', file=sys.stderr)
         exit(1)
 
 
@@ -290,6 +290,9 @@ if __name__ == '__main__':
     adverse = names[1]
     path = sys.argv[2]
     outfile = sys.argv[3]
+    baseline = False
+    if len(sys.argv) == 5 and '-b' == sys.argv[4]:
+        baseline = True
 
     horizon = get_horizon(path)
     adv = []
@@ -319,7 +322,7 @@ if __name__ == '__main__':
         model_adverse(adverse, moveL)
         filelist.append('encoding_adverse.lp')
 
-
-    quantifier_shifting(filelist)
-    filelist.append('quantification.lp')
+    if baseline == False:
+        quantifier_shifting(filelist)
+        filelist.append('quantification.lp')
     sasp2ssat(filelist, outfile)

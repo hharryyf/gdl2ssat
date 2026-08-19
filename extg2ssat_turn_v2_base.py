@@ -467,7 +467,7 @@ if __name__ == '__main__':
         filelist.append('encoding_adverse.lp')
 
 
-    quantifier_shifting(filelist)
-    filelist.append('quantification.lp')
+    #quantifier_shifting(filelist)
+    #filelist.append('quantification.lp')
     sasp2ssat(filelist, outfile)
     
